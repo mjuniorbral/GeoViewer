@@ -1,84 +1,123 @@
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
-class Grafico():
-    def __init__(self,nome="graph",width=12,height=6) -> None:
-        self.nome = str(nome)
-        self.figure, self.axes = plt.subplots(figsize=(width, height))
-        self.figure.tight_layout()
-        self.series:list[Serie] = []
-        pass
-    def addSeries(self,series:list=[]):
-        if isinstance(series,list):
-            if len(series)>0:
-                self.series.extend(series)
-            else:
-                raise Exception("Parâmetros series do método Grafico.addSeries está vazio.")
-        else:
-            raise Exception("Parâmetros series do método Grafico.addSeries não é do tipo list.")
-    def plotar(self):
-        for serie in self.series:
-            # Implementar color no plot
-            # implementar marker no plot
-            # implementar tipo de linha no plot
-
-            if serie.tipo == "line":
-                self.axes.plot(serie.x,serie.y,label=serie.nome)
-            elif serie.tipo == "bar":
-                self.axes.bar(x=serie.x,height=serie.y,label=self.nome)
-            elif serie.tipo == "scatter":
-                self.axes.scatter(x=serie.x,y=serie.y,label=self.nome)
-
-
-    def salvar(self,nomeArquivo="",format="png",transparent=False):
-        if nomeArquivo=="":
-            nomeArquivo = self.nome+"."+format
-        else:
-            nomeArquivo = nomeArquivo+"."+format
-        self.axes.legend(
-            # loc='upper center',
-            bbox_to_anchor=(0.5, -0.25),
-            fancybox=True,
-            shadow=False,
-            ncol=5)
-        plt.subplots_adjust(bottom=0.2)
-        self.figure.savefig(fname=nomeArquivo,transparent=transparent,format=format)
-
+plt.rcParams.update({"legend.fontsize":14})
 
 class Serie():
-    def __init__(self,nome,df,xNome,yNome,tipo="line",mostrarNaLegenda:bool=True,ID:str="") -> None:
-        if ID=="":
-            self.ID = nome
+    def __init__(self,X=None,Y=None,type="plot",label="",toSecundary=False,showLegend=True) -> None:
+        if X==None or Y==None:
+            self.X = np.linspace(0.5, 3.5, 20)
+            self.Y = 3+np.cos(self.X)
         else:
-            self.ID = ID
-        self.nome = nome
-        self.x = df[xNome]
-        self.y = df[yNome]
-        self.maximos = dict(
-            xMax = max(self.x),
-            xMin = min(self.x),
-            yMax = max(self.y),
-            yMin = min(self.y)
-        )
-        self.data = pd.DataFrame({
-            xNome:self.x,
-            yNome:self.y
-            })
-        self.tipo = tipo
-        self.mostrarNaLegenda = mostrarNaLegenda
+            self.X = X
+            self.Y = Y
+        self.type = type
+        self.label = label # Atributos para recuperação da informação passada no construtor
+        if showLegend:
+            self.label_legend = label
+        else:
+            self.label_legend = ""
+        self.toSecundary = toSecundary
+        self.showLegend = showLegend
+        pass
+        
+class Grafico():
+    def __init__(self,
+                 series:list[Serie]=[Serie(label="linha"),Serie(label="barra",type="bar"),Serie(toSecundary=True)],
+                 width=7.5,
+                 height=7.5,
+                 ) -> None:
+        # Figure
+        self.fig = plt.figure(figsize=(width, height))
+        
+        # Axes
+        self.ax:plt.Axes = self.fig.add_axes([0.1, 0.2, 0.8, 0.7])
 
-if __name__=="__main__":
-    df = pd.DataFrame(
-        dict(
-            x=[1,2,3,4],
-            y=[1,3,6,3]
-        )
-    )
-    serie1 = Serie("pico",df,"x","y","line",True)
-    serie2 = Serie("pico",df,"x","y","bar",True)
-    serie3 = Serie("pico",df,"x","y","scatter",True)
-    graf1 = Grafico(1)
-    graf1.addSeries([serie1,serie2,serie3])
-    graf1.plotar()
-    graf1.salvar()
-    print(graf1.axes.get_legend_handles_labels())
+        # Plotting all Serie's entities
+        self.objectsPlot = []
+        self.objectsBar = []
+        self.objectsScatter = []
+
+        self.hasSecundary = False        
+        
+        for serie in series:
+            if serie.toSecundary:
+                if not self.hasSecundary:
+                    self.ax2 = self.ax.twinx()
+                    self.hasSecundary = True
+                # Plot Graph
+                if serie.type=="plot":
+                    self.objectsPlot.append(self.ax2.plot(serie.X, serie.Y, c='red', lw=2.5, label=serie.label_legend, zorder=10))
+
+                # Bar Graph
+                elif serie.type=="bar":
+                    self.objectsBar.append(self.ax2.bar(serie.X, serie.Y,label=serie.label_legend))
+            else:
+                # Plot Graph
+                if serie.type=="plot":
+                    self.objectsPlot.append(self.ax.plot(serie.X, serie.Y, c='red', lw=2.5, label=serie.label_legend, zorder=10))
+
+                # Bar Graph
+                elif serie.type=="bar":
+                    self.objectsBar.append(self.ax.bar(serie.X, serie.Y,label=serie.label_legend))
+                    pass
+
+        # Axis X
+        self.ax.set_xlabel("x Axis label", fontsize=14)
+        self.ax.set_xlim(0, 4)
+        self.ax.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="x")
+        self.ax.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="x")
+        self.ax.xaxis.set_major_locator(MultipleLocator(1.000))
+        self.ax.xaxis.set_major_formatter("{x:.0f}") # Comentar a linha para retirar o número
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator(4))
+        self.ax.xaxis.set_minor_formatter("{x:.2f}") # Comentar a linha para retirar o número
+
+        # Axis Y
+        self.ax.set_ylabel("y Axis label", fontsize=14)
+        self.ax.set_ylim(0, 4)
+        self.ax.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="y")
+        self.ax.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="y")
+        self.ax.yaxis.set_major_locator(MultipleLocator(1.000))
+        self.ax.yaxis.set_major_formatter("{x:.0f}") # Comentar a linha para retirar o número
+        self.ax.yaxis.set_minor_locator(AutoMinorLocator(4))
+        self.ax.yaxis.set_minor_formatter("{x:.2f}") # Comentar a linha para retirar o número
+        
+        # Axis Y2        
+        if self.hasSecundary:
+            self.ax2.set_ylabel("y Axis label", fontsize=14)
+            self.ax2.set_ylim(0, 4)
+            self.ax2.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="y")
+            self.ax2.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="y")
+            self.ax2.yaxis.set_major_locator(MultipleLocator(1.000))
+            self.ax2.yaxis.set_major_formatter("{x:.0f}") # Comentar a linha para retirar o número
+            self.ax2.yaxis.set_minor_locator(AutoMinorLocator(4))
+            self.ax2.yaxis.set_minor_formatter("{x:.2f}") # Comentar a linha para retirar o número
+        
+        
+        self.ax.set_title("Anatomy of a figure", fontsize=20, verticalalignment='bottom')
+        
+        
+        # self.ax.grid(linestyle="--", linewidth=0.5, color='.25', zorder=-10)
+        # self.ax.plot(X, Y2, c='C1', lw=2.5, label="Orange signal")
+        # self.ax.plot(X[::3], Y3[::3], linewidth=0, markersize=9, marker='s', markerfacecolor='none', markeredgecolor='C4', markeredgewidth=2.5)
+        
+        self.ax.legend(loc="upper center", bbox_to_anchor=(0.5,-0.2), ncols=5, borderaxespad=0.1)
+        
+        # self.fig.patch.set(linewidth=4, edgecolor='0.5')
+        self.fig.savefig("1.png")
+
+class Serie3D(Serie):
+    def __init__(self, X=None, Y=None, Z=None, type="scatter", label="", toSecundary=False, showLegend=True) -> None:
+        self.Z = Z
+        super().__init__(X, Y, type, label, toSecundary, showLegend)
+
+
+class Grafico3D(Grafico):
+    def __init__(self, series: list[Serie3D], width=7.5, height=7.5) -> None:
+        """!!!!!! Ainda não implementado !!!!!!"""
+        super().__init__(series, width, height)
+
+Grafico()
