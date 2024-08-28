@@ -1,6 +1,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 
@@ -27,11 +28,11 @@ class Serie():
 class Grafico():
     def __init__(self,
                  series:list[Serie]=[Serie(label="linha"),Serie(label="barra",type="bar"),Serie(toSecundary=True)],
-                 width=7.5,
-                 height=7.5,
+                 width=12,
+                 height=6,
                  ) -> None:
         # Figure
-        self.fig = plt.figure(figsize=(width, height))
+        self.fig:Figure = plt.figure(figsize=(width, height))
         
         # Axes
         self.ax:plt.Axes = self.fig.add_axes([0.1, 0.2, 0.8, 0.7])
