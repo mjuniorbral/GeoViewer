@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.dates import DateFormatter,DayLocator,MonthLocator,YearLocator
@@ -6,44 +5,112 @@ from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 from matplotlib.pyplot import rcParams
+if __name__=="__main__":
+    from functions import pullValues
+else:
+    from .functions import pullValues
 
 plt.rcParams.update({"legend.fontsize":14})
+X = np.linspace(0.5, 3.5, 20)
+Y = 3+np.cos(X)
 
 class Serie():
-    def __init__(self,X=None,Y=None,type="plot",label="",color=None,toSecundary=False,showLegend=True,barWidth=0.8,setup=dict()) -> None:
-        self.setup = dict(
-            par1 = "Exemplo de parâmetro padrão"
-        )
-        self.setup.update(setup)
-        
-        if X==None or Y==None:
-            self.X = np.linspace(0.5, 3.5, 20)
-            self.Y = 3+np.cos(self.X)
-        else:
-            self.X = X
-            self.Y = Y
+    
+    def __init__(self,X=None,Y=None,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict()) -> None:
+        self.X = X
+        self.Y = Y
         self.type = type
         self.color = color
         self.label = label # Atributos para recuperação da informação passada no construtor
         if showLegend:
             self.label_legend = label
         else:
-            self.label_legend = ""
+            self.label_legend = None
         self.toSecundary = toSecundary
         self.showLegend = showLegend
-        if self.type=="bar":
-            if barWidth==0:
-                self.width = (max(self.X)-min(self.X))/(len(self.X)-1)
-            else:
-                self.width = barWidth
+        if self.type == "plot":
+            self.setup = dict(
+                label=self.label_legend,   # Nome na legenda
+                color=self.color,          # Cor das linhas e marcadores
+                linestyle='-',             # Estilo da linha ('-', '--', '-.', ':', 'None', etc.)
+                linewidth=1.5,             # Espessura da linha
+                marker=None,               # Estilo do marcador ('o', 's', '^', '*', etc.)
+                markersize=6.0,            # Tamanho do marcador
+                markerfacecolor=None,      # Cor de preenchimento do marcador
+                markeredgecolor=None,      # Cor da borda do marcador
+                markeredgewidth=1.0,       # Largura da borda do marcador
+                alpha=None,                # Transparência (0.0 a 1.0)
+                zorder=2,                  # Ordem na sobreposição de elementos
+                drawstyle='default',       # Estilo de conexão dos pontos ('default', 'steps-pre', etc.)
+                )
+        elif self.type == "bar":
+            self.setup = dict(
+                width=0.8,                 # Largura das barras
+                bottom=0,                  # Base das barras
+                align='center',            # Alinhamento das barras ('center' ou 'edge')
+                color=self.color,          # Cor das barras
+                edgecolor=self.color,      # Cor da borda das barras
+                linewidth=None,            # Espessura da borda
+                tick_label=None,           # Etiquetas do eixo x
+                hatch=None,                # Padrão de preenchimento (e.g., '/', '\\', 'x', etc.)
+                label=self.label_legend,   # Nome na legenda
+                alpha=None,                # Transparência (0.0 a 1.0)
+                zorder=2,                  # Ordem na sobreposição de elementos
+                log=False,                 # Escala logarítmica no eixo y
+                error_kw=None,             # Parâmetros de erro adicionais para as barras de erro
+                capsize=None,              # Tamanho das extremidades das barras de erro
+            )
+        self.setup.update(setup)
         pass
+
     def render(self,axes:plt.Axes):
         """Ainda não implementado"""
+        self.axes = axes
         if self.type == "plot":
-            self.art = axes.plot()
+            kwargs = pullValues(
+                self.setup,
+                [
+                "color",
+                "label",
+                "linewidth",
+                "alpha",
+                "zorder",
+                "log",
+                "xerr",
+                "yerr",
+                # Exclusive Plot's Params
+                "markersize",
+                "linestyle",
+                "marker",
+                "markerfacecolor",
+                "markeredgecolor",
+                "markeredgewidth",
+                "drawstyle",
+                ]
+                )
+            self.art = axes.plot(self.X, self.Y,**kwargs)
+
         elif self.type == "bar":
-            self.art = axes.bar()            
-        pass
+            kwargs = pullValues(
+                self.setup,
+                ["color",
+                "label",
+                "linewidth",
+                "alpha",
+                "zorder",
+                "log",
+                "xerr",
+                "yerr",
+                # Exclusive Bar's Params
+                "tick_label",
+                "hatch",
+                "edgecolor",
+                "capsize",
+                "bottom",
+                "width",
+                "error_kw"])
+            self.art = axes.bar(self.X, self.Y,**kwargs)
+        return self.art
         
 class Grafico():
     def __init__(self,
@@ -105,9 +172,7 @@ class Grafico():
         
 
         # Plotting all Serie's entities
-        self.objectsPlot = []
-        self.objectsBar = []
-        self.objectsScatter = []
+        self.objetcsArtist = []
 
         self.hasSecundary = False        
         
@@ -122,22 +187,9 @@ class Grafico():
                         self.ax2.yaxis.set_label_position("left")
                         self.ax2.yaxis.tick_left()
                     self.hasSecundary = True
-                # Plot Graph
-                if serie.type=="plot":
-                    self.objectsPlot.append(self.ax2.plot(serie.X, serie.Y, color=serie.color, lw=2.5, label=serie.label_legend, zorder=10))
-
-                # Bar Graph
-                elif serie.type=="bar":
-                    self.objectsBar.append(self.ax2.bar(serie.X, serie.Y, width=serie.width, color=serie.color, label=serie.label_legend))
+                self.objetcsArtist.append(serie.render(self.ax2))
             else:
-                # Plot Graph
-                if serie.type=="plot":
-                    self.objectsPlot.append(self.ax.plot(serie.X, serie.Y, color=serie.color, lw=2.5, label=serie.label_legend, zorder=10))
-
-                # Bar Graph
-                elif serie.type=="bar":
-                    self.objectsBar.append(self.ax.bar(serie.X, serie.Y, width=serie.width, color=serie.color, label=serie.label_legend))
-                    pass
+                self.objetcsArtist.append(serie.render(self.ax))
 
         # Axis X
         self.ax.set_xlabel("x Axis label", fontsize=14)
@@ -206,5 +258,5 @@ class Grafico3D(Grafico):
         super().__init__(series, width, height)
 
 if __name__=="__main__":
-    graph = Grafico(series=[Serie(label="barra",type="bar",color="red"),Serie(label="plot",color="yellow"),Serie(label="plot2",toSecundary=True,color="blue")])
+    graph = Grafico(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
     graph.save("1.png")

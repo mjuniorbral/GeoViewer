@@ -45,6 +45,14 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
+def pullValues(dict:dict,keys:list):
+    dictToReturn = {}
+    for key,value in dict.items():
+        if key in keys:
+            dictToReturn.update({key:value})
+    return dictToReturn
+        
+
 def criarDiretorio (relativePath:str) -> None:
     if not os.path.exists(relativePath):
         os.mkdir(relativePath)
