@@ -205,5 +205,6 @@ class Grafico3D(Grafico):
         """!!!!!! Ainda não implementado !!!!!!"""
         super().__init__(series, width, height)
 
-graph = Grafico(series=[Serie(label="barra",type="bar",color="red"),Serie(label="plot",color="yellow"),Serie(label="plot2",toSecundary=True,color="blue")])
-graph.save("1.png")
+if __name__=="__main__":
+    graph = Grafico(series=[Serie(label="barra",type="bar",color="red"),Serie(label="plot",color="yellow"),Serie(label="plot2",toSecundary=True,color="blue")])
+    graph.save("1.png")
