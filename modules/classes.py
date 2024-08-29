@@ -135,23 +135,15 @@ class Grafico():
             y2MinorFormatter = "",
             xMajorLocator = MonthLocator(interval=6),
             xMinorLocator = MonthLocator(interval=6),
-            yMajorLocator = MultipleLocator(2.),
-            yMinorLocator = AutoMinorLocator(2),
-            y2MajorLocator = MultipleLocator(2.),
-            y2MinorLocator = AutoMinorLocator(2),
+            yMajorLocator = None, #MultipleLocator(2.),
+            yMinorLocator = None, #AutoMinorLocator(2),
+            y2MajorLocator = None, #MultipleLocator(2.),
+            y2MinorLocator = None, #AutoMinorLocator(2),
             invertSidesYAxis = True,
             figureAutoLayout = True,
             rectFigureBaseAdd_axes = [0.1, 0.2, 0.8, 0.7]
         )
         self.setup.update(setup)
-        
-        
-        # Hardcoded config ######################### Retirar na versão final ######################################
-        self.setup.update(dict(
-            xMajorFormatter = "{x:.0f}",
-            xMajorLocator = MultipleLocator(2.)
-            ))
-        ###########################################################################################################
         
         # Setup Figure and Axes
         rcParams["figure.autolayout"] = self.setup["figureAutoLayout"]
