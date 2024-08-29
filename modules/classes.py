@@ -1,15 +1,21 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.dates import DateFormatter
+from matplotlib.dates import DateFormatter,DayLocator,MonthLocator,YearLocator
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
+from matplotlib.pyplot import rcParams
 
 plt.rcParams.update({"legend.fontsize":14})
 
 class Serie():
-    def __init__(self,X=None,Y=None,type="plot",label="",color=None,toSecundary=False,showLegend=True) -> None:
+    def __init__(self,X=None,Y=None,type="plot",label="",color=None,toSecundary=False,showLegend=True,barWidth=0.8,setup=dict()) -> None:
+        self.setup = dict(
+            par1 = "Exemplo de parâmetro padrão"
+        )
+        self.setup.update(setup)
+        
         if X==None or Y==None:
             self.X = np.linspace(0.5, 3.5, 20)
             self.Y = 3+np.cos(self.X)
@@ -25,45 +31,78 @@ class Serie():
             self.label_legend = ""
         self.toSecundary = toSecundary
         self.showLegend = showLegend
+        if self.type=="bar":
+            if barWidth==0:
+                self.width = (max(self.X)-min(self.X))/(len(self.X)-1)
+            else:
+                self.width = barWidth
+        pass
+    def render(self,axes:plt.Axes):
+        """Ainda não implementado"""
+        if self.type == "plot":
+            self.art = axes.plot()
+        elif self.type == "bar":
+            self.art = axes.bar()            
         pass
         
 class Grafico():
     def __init__(self,
                  series:list[Serie],
-                 width=12,
-                 height=6,
+                 title:str = "",
                  setup:dict=dict()
                  ) -> None:
+        self.title = title
+        
         # Config
         self.setup:dict = dict(
+            width=12,
+            height=6,
             xlim = (None,None),
             ylim = (None,None),
             y2lim = (None,None),
-            xMajorFormatter = DateFormatter("%m-%y"),
+            xMajorFormatter = DateFormatter("%b/%Y"),
             xMinorFormatter = "",
-            yMajorFormatter = "{x:.0f}",
+            yMajorFormatter = "{x:.2f}",
             yMinorFormatter = "",
-            y2MajorFormatter = "{x:.0f}",
+            y2MajorFormatter = "{x:.2f}",
             y2MinorFormatter = "",
-            xMajorLocator = MultipleLocator(2.),
-            xMinorLocator = AutoMinorLocator(5),
+            xMajorLocator = MonthLocator(interval=6),
+            xMinorLocator = MonthLocator(interval=6),
             yMajorLocator = MultipleLocator(2.),
-            yMinorLocator = AutoMinorLocator(5),
+            yMinorLocator = AutoMinorLocator(2),
             y2MajorLocator = MultipleLocator(2.),
-            y2MinorLocator = AutoMinorLocator(5),
-            invertSidesYAxis = True
+            y2MinorLocator = AutoMinorLocator(2),
+            invertSidesYAxis = True,
+            figureAutoLayout = True,
+            rectFigureBaseAdd_axes = [0.1, 0.2, 0.8, 0.7]
         )
         self.setup.update(setup)
         
+        
         # Hardcoded config ######################### Retirar na versão final ######################################
-        self.setup.update(dict(xMajorFormatter = "{x:.0f}"))
+        self.setup.update(dict(
+            xMajorFormatter = "{x:.0f}",
+            xMajorLocator = MultipleLocator(2.)
+            ))
         ###########################################################################################################
         
-        # Figure
-        self.fig:Figure = plt.figure(figsize=(width, height))
+        # Setup Figure and Axes
+        rcParams["figure.autolayout"] = self.setup["figureAutoLayout"]
+        if self.setup["figureAutoLayout"]:
+            aux = plt.subplots(figsize=(self.setup["width"], self.setup["height"]))
+            self.fig:Figure = aux[0]
+            self.ax:plt.Axes = aux[1]
+            
+            # User Warning
+            if "rectFigureBaseAdd_axes" in setup.keys():
+                print("User Warning: setup['rectFigureBaseAdd_axes'] não foi usado pois self.setup['figureAutoLayout']==True. Aconselha-se alterar o setup['figureAutoLayout'] para False.")
         
-        # Axes
-        self.ax:plt.Axes = self.fig.add_axes([0.1, 0.2, 0.8, 0.7])
+        else:
+            # Figure
+            self.fig:Figure = plt.figure(figsize=(self.setup["width"], self.setup["height"]))            
+            # Axes
+            self.ax:plt.Axes = self.fig.add_axes(self.setup["rectFigureBaseAdd_axes"])
+        
 
         # Plotting all Serie's entities
         self.objectsPlot = []
@@ -89,7 +128,7 @@ class Grafico():
 
                 # Bar Graph
                 elif serie.type=="bar":
-                    self.objectsBar.append(self.ax2.bar(serie.X, serie.Y, color=serie.color, label=serie.label_legend))
+                    self.objectsBar.append(self.ax2.bar(serie.X, serie.Y, width=serie.width, color=serie.color, label=serie.label_legend))
             else:
                 # Plot Graph
                 if serie.type=="plot":
@@ -97,7 +136,7 @@ class Grafico():
 
                 # Bar Graph
                 elif serie.type=="bar":
-                    self.objectsBar.append(self.ax.bar(serie.X, serie.Y, color=serie.color, label=serie.label_legend))
+                    self.objectsBar.append(self.ax.bar(serie.X, serie.Y, width=serie.width, color=serie.color, label=serie.label_legend))
                     pass
 
         # Axis X
@@ -131,14 +170,11 @@ class Grafico():
             self.ax2.yaxis.set_minor_locator(self.setup["y2MinorLocator"])
             self.ax2.yaxis.set_minor_formatter(self.setup["y2MinorFormatter"])
         
-        
-        self.ax.set_title("Anatomy of a figure", fontsize=20, verticalalignment='bottom')
-        
-        
-        # self.ax.grid(linestyle="--", linewidth=0.5, color='.25', zorder=-10)
-        # self.ax.plot(X, Y2, c='C1', lw=2.5, label="Orange signal")
-        # self.ax.plot(X[::3], Y3[::3], linewidth=0, markersize=9, marker='s', markerfacecolor='none', markeredgecolor='C4', markeredgewidth=2.5)
-        
+        # Set Title
+        if len(self.title):
+            self.ax.set_title(self.title, fontsize=20, verticalalignment='bottom')
+
+        # Set Legend
         handles1, labels1 = self.ax.get_legend_handles_labels()
         handles = handles1
         labels = labels1
@@ -152,9 +188,8 @@ class Grafico():
                 labels += labels2
         self.handles, self.labels = handles, labels
         self.ax.legend(self.handles, self.labels, loc="upper center", bbox_to_anchor=(0.5,-0.2), ncols=5, borderaxespad=0.1)
-        
-        # self.fig.patch.set(linewidth=4, edgecolor='0.5')
-    
+        return
+
     def save (self,path:str):
         self.fig.savefig(path)
 
