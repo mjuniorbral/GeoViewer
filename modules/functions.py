@@ -45,6 +45,18 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
+def getWindowsLegend(legend):
+    # Obtendo a posição e o tamanho da legenda
+    bbox = legend.get_window_extent()
+
+    # Convertendo as coordenadas de janela para coordenadas da figura
+    bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
+
+    # Imprimindo a posição e o tamanho
+    print(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
+    print(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
+    return bbox
+
 def pullValues(dict:dict,keys:list):
     dictToReturn = {}
     for key,value in dict.items():
