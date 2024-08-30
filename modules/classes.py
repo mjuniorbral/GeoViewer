@@ -210,8 +210,14 @@ class Grafico():
             else:
                 self.ax.grid(self.setup["grid"],axis="x")
                 self.ax.grid(self.setup["grid"],"both",axis="y")
-                
-        # Put the axis on the correct place
+
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+
+        # Put the axis on the correct place                          <<<=================
         print(self.setup["invertSidesYAxis"])
         if self.hasSecundary:
             if self.setup["invertSidesYAxis"]:
@@ -226,7 +232,11 @@ class Grafico():
                 print("inverteu um eixo só")
         pass
                 
-
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
+        ### Em implementação ############################################################
 
     def render(self):
         
