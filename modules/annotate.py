@@ -5,7 +5,7 @@ from matplotlib.axes import Axes
 royal_blue = [0, 20/256, 82/256]
 
 # Annotate the figure
-def annotate(x, y, text, code, ax:Axes):
+def annotate(x, y, ax:Axes, text="", code=""):
     # Circle marker
     c = Circle((x, y), radius=0.15, clip_on=False, zorder=10, linewidth=2.5,
                edgecolor=royal_blue + [0.6], facecolor='none',

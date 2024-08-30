@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from matplotlib.figure import Figure
-from matplotlib.legend import Legend
+from matplotlib.artist import Artist
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
@@ -47,17 +47,6 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
-def getWindowsLegend(legend:Legend,fig:Figure):
-    # Obtendo a posição e o tamanho da legenda
-    bbox = legend.get_window_extent()
-
-    # Convertendo as coordenadas de janela para coordenadas da figura
-    bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
-
-    # Imprimindo a posição e o tamanho
-    print(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
-    print(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
-    return bbox
 def getFunctionToFuncFormatter(nCasasDecimais,sepDecimal=",",sepMilhar=""):
     """Função para construir uma função de formatação de float com separador de milhar e decimal customizado para a classe FuncFormatter."""
     def functionToReturn(x,pos):
@@ -75,6 +64,18 @@ def pullValues(dict:dict,keys:list):
             dictToReturn.update({key:value})
     return dictToReturn
         
+def getWindowsArtist(artist:Artist,fig:Figure,print_=False):
+    # Obtendo a posição e o tamanho do artist
+    bbox = artist.get_window_extent()
+    
+    # Convertendo as coordenadas de janela para coordenadas da figura
+    bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
+
+    if print_:
+        # Imprimindo a posição e o tamanho
+        print(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
+        print(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
+    return bbox
 
 def criarDiretorio (relativePath:str) -> None:
     if not os.path.exists(relativePath):
