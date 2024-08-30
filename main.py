@@ -19,6 +19,7 @@ if __name__=="__main__":
     
     #Construindo ordem de plotagem
     series = [manuais,automaticas,pluviometria]
+    # series = [manuais,automaticas]
     
     #Inicializando, renderizando e salvando o gráfico
     graph = Grafico(series=series)

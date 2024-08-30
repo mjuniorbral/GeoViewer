@@ -144,12 +144,12 @@ class Grafico():
             xMajorLocator = MonthLocator(interval=1),
             xMinorLocator = MonthLocator(interval=1),
             yMajorLocator = AutoLocator(),
-            yMinorLocator = AutoMinorLocator(),
+            yMinorLocator = AutoMinorLocator(2),
             y2MajorLocator = AutoLocator(),
-            y2MinorLocator = AutoMinorLocator(),
-            invertSidesYAxis = True,
+            y2MinorLocator = AutoMinorLocator(1),
+            invertSidesYAxis = False,
             figureAutoLayout = True,
-            grid = False,
+            grid = True,
             rectFigureBaseAdd_axes = [0.1, 0.2, 0.8, 0.7],
             xLabelTicksRotation = 90,
             yLabelTicksRotation = 0,
@@ -157,16 +157,16 @@ class Grafico():
             axMargins = 0.1005,
             ax2Margins = 0.1005,
 
-            xLabel = "Data",
+            xLabel = "",
             xLabelFontsize = 14,
             yLabel = "Elevação (m)",
             yLabelFontsize = 14,
-            y2Label = "Pluviometria (mm)",
+            y2Label = "Precipitação (mm)",
             y2LabelFontsize = 14,
             tickMajorWidth = 1.,
             tickMinorWidth = 1.,
-            tickMajorLength = 10,
-            tickMinorLength = 5,
+            tickMajorLength = 5,
+            tickMinorLength = 3,
             labelMajorSize = 14,
             labelMinorSize = 10,
             labelMajorColor = "black",
@@ -192,9 +192,6 @@ class Grafico():
             # Axes
             self.ax:plt.Axes = self.fig.add_axes(self.setup["rectFigureBaseAdd_axes"])
         
-        if self.setup["invertSidesYAxis"]:
-            self.ax.yaxis.set_label_position("right")
-            self.ax.yaxis.tick_right()
             
         self.hasSecundary = hasSecundary
         # Creating secundary axis, if exist
@@ -202,17 +199,31 @@ class Grafico():
             if serie.toSecundary or self.hasSecundary:
                 secondAxis = self.ax.twinx()
                 # self.ax2 = secondAxis
-                
                 # Invert axis because self.ax2 must be the first generated
                 self.ax,self.ax2 = secondAxis,self.ax
-                if self.setup["invertSidesYAxis"]:
-                    # Inverting sides
-                    self.ax.yaxis.set_label_position("right")
-                    self.ax.yaxis.tick_right()
-                    self.ax2.yaxis.set_label_position("left")
-                    self.ax2.yaxis.tick_left()
                 self.hasSecundary = True
                 break
+        if self.setup["grid"]:
+            if self.hasSecundary:
+                self.ax2.grid(self.setup["grid"],axis="x")
+                self.ax.grid(self.setup["grid"],"both",axis="y")
+            else:
+                self.ax.grid(self.setup["grid"],axis="x")
+                self.ax.grid(self.setup["grid"],"both",axis="y")
+                
+        # Put the axis on the correct place
+        print(self.setup["invertSidesYAxis"])
+        if self.hasSecundary:
+            if self.setup["invertSidesYAxis"]:
+                self.ax.yaxis.set_label_position("left")
+                self.ax.yaxis.tick_left()
+                self.ax2.yaxis.set_label_position("right")
+                self.ax2.yaxis.tick_right()
+                print("inverteu os dois eixos")
+            else:
+                self.ax.yaxis.set_label_position("right")
+                self.ax.yaxis.tick_right()
+                print("inverteu um eixo só")
         pass
                 
 
