@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from matplotlib.figure import Figure
+from matplotlib.legend import Legend
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
@@ -45,7 +47,7 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
-def getWindowsLegend(legend):
+def getWindowsLegend(legend:Legend,fig:Figure):
     # Obtendo a posição e o tamanho da legenda
     bbox = legend.get_window_extent()
 
