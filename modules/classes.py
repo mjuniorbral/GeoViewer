@@ -306,7 +306,6 @@ class Grafico():
         # getWindowsArtist(self.ax,self.fig,True)
         # getWindowsArtist(self.legend,self.fig,True)
         # annotate(10,10,self.ax)
-        self.listArtists()
         
         self.rendered = True
         return
@@ -334,8 +333,6 @@ class Grafico():
     
     def show (self,warn=True):
         self.fig.show(warn=warn)
-    def listArtists(self):
-        return self.fig.artists
         
 class Serie3D(Serie):
     def __init__(self, X=None, Y=None, Z=None, type="scatter", label="", toSecundary=False, showLegend=True) -> None:
