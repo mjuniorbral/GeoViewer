@@ -139,22 +139,60 @@ class Grafico():
             xMinorFormatter = "",
             yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
             yMinorFormatter = "",
-            y2MajorFormatter = "{x:.2f}",
+            y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
             y2MinorFormatter = "",
             xMajorLocator = MonthLocator(interval=6),
             xMinorLocator = MonthLocator(interval=1),
             yMajorLocator = AutoLocator(),
-            yMinorLocator = AutoMinorLocator(4),
+            yMinorLocator = AutoMinorLocator(),
             y2MajorLocator = AutoLocator(),
-            y2MinorLocator = AutoMinorLocator(4),
+            y2MinorLocator = AutoMinorLocator(),
             invertSidesYAxis = True,
             figureAutoLayout = True,
+            grid = False,
             rectFigureBaseAdd_axes = [0.1, 0.2, 0.8, 0.7],
             xLabelTicksRotation = 90,
             yLabelTicksRotation = 0,
             y2LabelTicksRotation = 0,
-            axMargins = 0.0005,
-            ax2Margins = 0.0005,
+            axMargins = 0.1005,
+            ax2Margins = 0.1005,
+
+            xLabel = "Data",
+            xLabelFontsize = 14,
+            xFormatting = dict(
+                tickMajorWidth = 1.,
+                tickMinorWidth = 1.,
+                tickMajorLength = 10,
+                tickMinorLength = 5,
+                labelMajorSize = 14,
+                labelMinorSize = 10,
+                labelMajorColor = "black",
+                labelMinorColor = "black",                
+            ),
+            yLabel = "Elevação (m)",
+            yLabelFontsize = 14,
+            yFormatting = dict(
+                tickMajorWidth = 1.,
+                tickMinorWidth = 1.,
+                tickMajorLength = 10,
+                tickMinorLength = 5,
+                labelMajorSize = 14,
+                labelMinorSize = 10,
+                labelMajorColor = "black",
+                labelMinorColor = "black",                
+            ),
+            y2Label = "Pluviometria (mm)",
+            y2LabelFontsize = 14,
+            y2Formatting = dict(
+                tickMajorWidth = 1.,
+                tickMinorWidth = 1.,
+                tickMajorLength = 10,
+                tickMinorLength = 5,
+                labelMajorSize = 14,
+                labelMinorSize = 10,
+                labelMajorColor = "blue",
+                labelMinorColor = "black",                
+            ),
         )
         self.setup.update(setup)
         self.rendered = False
@@ -218,39 +256,23 @@ class Grafico():
             else:
                 self.objetcsArtist.append(serie.render(self.ax))
 
-        # Setup Axis
-        # Axis X
-        # xLabel = "",
-        # yLabel = "",
-        # y2Label = "",
-        # xLabelFontsize = 14,
-        # yLabelFontsize = 14,
-        # y2LabelFontsize = 14,
-        
-        # tickMajorWidth = 1.
-        # tickMinorWidth = 1.
-        # tickMajorLength = 10
-        # tickMinorLength = 10
-        # labelMajorSize = 14
-        # labelMinorSize = 10
-        # labelColor = "0.25" # Igual para o Major e Minor
         
         
         
-        self.ax.set_xlabel("x Axis label", fontsize=14)
+        self.ax.set_xlabel(self.setup["xLabel"], fontsize=self.setup["xLabelFontsize"])
+        self.ax.tick_params(which='major', axis="x", width=self.setup["xFormatting"]["tickMajorWidth"], length=self.setup["xFormatting"]["tickMajorLength"], labelsize=self.setup["xFormatting"]["labelMajorSize"], labelcolor=self.setup["xFormatting"]["labelMajorColor"])
+        self.ax.tick_params(which='minor', axis="x", width=self.setup["xFormatting"]["tickMinorWidth"], length=self.setup["xFormatting"]["tickMinorLength"], labelsize=self.setup["xFormatting"]["labelMinorSize"], labelcolor=self.setup["xFormatting"]["labelMinorColor"])
         self.ax.set_xlim(self.setup["xlim"][0],self.setup["xlim"][1])
-        self.ax.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="x")
-        self.ax.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="x")
         self.ax.xaxis.set_major_locator(self.setup["xMajorLocator"])
         self.ax.xaxis.set_major_formatter(self.setup["xMajorFormatter"])
         self.ax.xaxis.set_minor_locator(self.setup["xMinorLocator"])
         self.ax.xaxis.set_minor_formatter(self.setup["xMinorFormatter"])
         self.ax.xaxis.set_tick_params(rotation=self.setup["xLabelTicksRotation"])
         if self.hasSecundary:
-            self.ax2.set_xlabel("x Axis label", fontsize=14)
+            self.ax2.set_xlabel(self.setup["xLabel"], fontsize=self.setup["xLabelFontsize"])
+            self.ax2.tick_params(which='major', axis="x", width=self.setup["xFormatting"]["tickMajorWidth"], length=self.setup["xFormatting"]["tickMajorLength"], labelsize=self.setup["xFormatting"]["labelMajorSize"], labelcolor=self.setup["xFormatting"]["labelMajorColor"])
+            self.ax2.tick_params(which='minor', axis="x", width=self.setup["xFormatting"]["tickMinorWidth"], length=self.setup["xFormatting"]["tickMinorLength"], labelsize=self.setup["xFormatting"]["labelMinorSize"], labelcolor=self.setup["xFormatting"]["labelMinorColor"])
             self.ax2.set_xlim(self.setup["xlim"][0],self.setup["xlim"][1])
-            self.ax2.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="x")
-            self.ax2.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="x")
             self.ax2.xaxis.set_major_locator(self.setup["xMajorLocator"])
             self.ax2.xaxis.set_major_formatter(self.setup["xMajorFormatter"])
             self.ax2.xaxis.set_minor_locator(self.setup["xMinorLocator"])
@@ -258,10 +280,10 @@ class Grafico():
             self.ax2.xaxis.set_tick_params(rotation=self.setup["xLabelTicksRotation"])
 
         # Axis Y
-        self.ax.set_ylabel("y Axis label", fontsize=14)
+        self.ax.set_ylabel(self.setup["yLabel"], fontsize=self.setup["yLabelFontsize"])
+        self.ax.tick_params(which='major', axis="y", width=self.setup["yFormatting"]["tickMajorWidth"], length=self.setup["yFormatting"]["tickMajorLength"], labelsize=self.setup["yFormatting"]["labelMajorSize"], labelcolor=self.setup["yFormatting"]["labelMajorColor"])
+        self.ax.tick_params(which='minor', axis="y", width=self.setup["yFormatting"]["tickMinorWidth"], length=self.setup["yFormatting"]["tickMinorLength"], labelsize=self.setup["yFormatting"]["labelMinorSize"], labelcolor=self.setup["yFormatting"]["labelMinorColor"])
         self.ax.set_ylim(self.setup["ylim"][0],self.setup["ylim"][1])
-        self.ax.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="y")
-        self.ax.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="y")
         self.ax.yaxis.set_major_locator(self.setup["yMajorLocator"])
         self.ax.yaxis.set_major_formatter(self.setup["yMajorFormatter"])
         self.ax.yaxis.set_minor_locator(self.setup["yMinorLocator"])
@@ -270,10 +292,10 @@ class Grafico():
         
         # Axis Y2        
         if self.hasSecundary:
-            self.ax2.set_ylabel("y2 Axis label", fontsize=14)
+            self.ax2.set_ylabel(self.setup["y2Label"], fontsize=self.setup["y2LabelFontsize"])
+            self.ax2.tick_params(which='major', axis="y", width=self.setup["y2Formatting"]["tickMajorWidth"], length=self.setup["y2Formatting"]["tickMajorLength"], labelsize=self.setup["y2Formatting"]["labelMajorSize"], labelcolor=self.setup["y2Formatting"]["labelMajorColor"])
+            self.ax2.tick_params(which='minor', axis="y", width=self.setup["y2Formatting"]["tickMinorWidth"], length=self.setup["y2Formatting"]["tickMinorLength"], labelsize=self.setup["y2Formatting"]["labelMinorSize"], labelcolor=self.setup["y2Formatting"]["labelMinorColor"])
             self.ax2.set_ylim(self.setup["y2lim"][0],self.setup["y2lim"][1])
-            self.ax2.tick_params(which='major', width=1.0, length=10, labelsize=14, axis="y")
-            self.ax2.tick_params(which='minor', width=1.0, length=5, labelsize=10, labelcolor='0.25', axis="y")
             self.ax2.yaxis.set_major_locator(self.setup["y2MajorLocator"])
             self.ax2.yaxis.set_major_formatter(self.setup["y2MajorFormatter"])
             self.ax2.yaxis.set_minor_locator(self.setup["y2MinorLocator"])
