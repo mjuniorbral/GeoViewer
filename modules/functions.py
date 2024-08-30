@@ -58,6 +58,15 @@ def getWindowsLegend(legend:Legend,fig:Figure):
     print(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
     print(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
     return bbox
+def getFunctionToFuncFormatter(nCasasDecimais,sepDecimal=",",sepMilhar=""):
+    """Função para construir uma função de formatação de float com separador de milhar e decimal customizado para a classe FuncFormatter."""
+    def functionToReturn(x,pos):
+        x = round(float(x),nCasasDecimais)
+        xStr = f"{x:,}".replace(",","#")
+        toReturn = xStr.replace(".","$")
+        toReturn = toReturn.replace('$', sepDecimal).replace("#",sepMilhar)
+        return toReturn+"0"*max(nCasasDecimais-len(toReturn.split(sepDecimal)[-1]),0)
+    return functionToReturn
 
 def pullValues(dict:dict,keys:list):
     dictToReturn = {}
