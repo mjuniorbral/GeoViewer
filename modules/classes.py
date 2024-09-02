@@ -211,32 +211,19 @@ class Grafico():
                 self.ax.grid(self.setup["grid"],axis="x")
                 self.ax.grid(self.setup["grid"],"both",axis="y")
 
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-
-        # Put the axis on the correct place                          <<<=================
-        print(self.setup["invertSidesYAxis"])
+        # Put the axis on the correct place
         if self.hasSecundary:
-            if self.setup["invertSidesYAxis"]:
+            if not self.setup['invertSidesYAxis']:
                 self.ax.yaxis.set_label_position("left")
                 self.ax.yaxis.tick_left()
                 self.ax2.yaxis.set_label_position("right")
                 self.ax2.yaxis.tick_right()
-                print("inverteu os dois eixos")
-            else:
+        else:
+            if self.setup['invertSidesYAxis']:
                 self.ax.yaxis.set_label_position("right")
                 self.ax.yaxis.tick_right()
-                print("inverteu um eixo só")
-        pass
-                
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
-        ### Em implementação ############################################################
+            pass
+
 
     def render(self):
         
