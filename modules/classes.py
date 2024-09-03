@@ -72,8 +72,7 @@ class Serie():
         pass
 
     def render(self,axes:plt.Axes):
-        """Ainda não implementado"""
-        self.axes = axes
+        self.axes.append(axes)
         if self.type == "plot":
             kwargs = pullValues(
                 self.setup,
