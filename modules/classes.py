@@ -7,13 +7,13 @@ from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
 if __name__=="__main__":
-    from functions import pullValues, getWindowsArtist, getFunctionToFuncFormatter
+    from functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from annotate import *
 else:
-    from .functions import pullValues, getWindowsArtist, getFunctionToFuncFormatter
+    from .functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from .annotate import *
 
-plt.rcParams.update({"legend.fontsize":14})
+plt.rcParams.update({"legend.fontsize":11})
 X = pd.DataFrame(np.linspace(0.5, 3.5, 20))
 Y = pd.DataFrame(3+np.cos(X))
 
@@ -24,6 +24,9 @@ class Serie():
         self.data = self.data.dropna()
         self.X = self.data.iloc[:,0]
         self.Y = self.data.iloc[:,1]
+        self.xLim:tuple = (min(self.X),max(self.X))
+        self.yLim:tuple = (min(self.Y),max(self.Y))
+        self.axes = []
         self.type = type
         self.color = color
         self.label = label # Atributos para recuperação da informação passada no construtor
@@ -223,7 +226,25 @@ class Grafico():
                 self.ax.yaxis.set_label_position("right")
                 self.ax.yaxis.tick_right()
             pass
+        
+        # Set Axis Limits based the self.series
+        xValores = []
+        yValores = []
+        y2Valores = []
 
+        for serie in series:
+            xValores.extend(serie.xLim)
+            if serie.toSecundary:
+                y2Valores.extend(serie.yLim)
+            else:
+                yValores.extend(serie.yLim)
+        if isEvery(xValores,pd.Timestamp):
+            self.setup.update(dict(xlim=intervaloPerfeitoData(xValores)))
+        else:
+            self.setup.update(dict(xlim=intervaloPerfeito(xValores)))
+        self.setup.update(dict(ylim = intervaloPerfeito(yValores), y2lim = intervaloPerfeito(y2Valores)))
+        
+        return           
 
     def render(self):
         

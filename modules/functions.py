@@ -47,6 +47,70 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
+def isEvery(iterable,type_):
+    for item in iterable:
+        if not isinstance(item,type_):
+            return False
+    return True
+
+def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max_=None,returndV=False):
+    if len(valores)==0:
+        return (None,None)
+    if min_==None:
+        min_ = min(valores)
+    if max_==None:
+        max_ = max(valores)
+    
+    if max_<min_:
+        raise Exception("Valor max menor do que valor min.")
+    if dV==None:
+        dVDefault = (0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50)
+        L = abs(max_-min_)
+        for dVi in sorted(dVDefault):
+            if 0<L/dVi<=10:
+                dV = dVi
+                break
+            else:
+                dV=1
+    if superior:
+        minPerf, maxPerf = (min_//dV)*dV-dV,(max_//dV)*dV+dV
+        if minPerf<0:
+            minPerf=0
+        if returndV:
+            return (minPerf, maxPerf), dV
+        else:
+            return (minPerf, maxPerf)
+    else:
+        raise Exception("Ainda não foi implementado o superior=False")
+
+def intervaloPerfeitoData(datas,dV=None,superior=True,min_=None,max_=None):
+    if len(datas)==0:
+        return (None,None)
+    if dV!=None:
+        raise Exception("Ainda não foi implementado o dV!=None")
+    if superior==False:
+        raise Exception("Ainda não foi implementado o superior=False")
+    
+    if min_==None:
+        min_:pd.Timestamp = min(datas)
+    if min_.month<=6:
+        minCorrigido = pd.Timestamp(day=1,month=1,year=min_.year)
+    elif min_.month==7 and min_.day==1:
+        minCorrigido = min_        
+    else:
+        minCorrigido = pd.Timestamp(day=1,month=7,year=min_.year)
+    
+    if max_==None:
+        max_:pd.Timestamp = max(datas)
+    if max_.month<=6:
+        maxCorrigido = pd.Timestamp(day=1,month=7,year=max_.year)
+    elif max_.month==7 and max_.day==1:
+        maxCorrigido = max_
+    else:
+        maxCorrigido = pd.Timestamp(day=1,month=1,year=max_.year+1)
+    
+    return (minCorrigido,maxCorrigido)
+
 def getFunctionToFuncFormatter(nCasasDecimais,sepDecimal=",",sepMilhar=""):
     """Função para construir uma função de formatação de float com separador de milhar e decimal customizado para a classe FuncFormatter."""
     def functionToReturn(x,pos):
@@ -174,7 +238,6 @@ def gerarHistorico(nomeInstrumento,
                    temCotaTopo=True,
                    temPLV=True
                    ):
-    print(1)
     pluv = tratarDados(nomeInstrumentoPluv)
     inst = tratarDados(nomeInstrumento)
     seco = tratarDados(nomeInstrumento,seco=True)
@@ -193,61 +256,7 @@ def gerarHistorico(nomeInstrumento,
             historico.loc[:,f"{nomeInstrumento} ({string})"] = get_info_instrument(nomeInstrumento,column)
     return historico
 
-def intervaloPerfeitoData(nomeInstrumento):
-    
-    min = definirLimites(nomeInstrumento)["data"]["min"]
-    if min.month<=6:
-        minCorrigido = pd.Timestamp(day=1,month=1,year=min.year)
-    elif min.month==7 and min.day==1:
-        minCorrigido = min        
-    else:
-        minCorrigido = pd.Timestamp(day=1,month=7,year=min.year)
-    
-    max = definirLimites(nomeInstrumento)["data"]["max"]
-    if max.month<=6:
-        maxCorrigido = pd.Timestamp(day=1,month=7,year=max.year)
-    elif max.month==7 and max.day==1:
-        maxCorrigido = max
-    else:
-        maxCorrigido = pd.Timestamp(day=1,month=1,year=max.year+1)
-    
-    return minCorrigido,maxCorrigido
 
-def intervaloPerfeito(nomeInstrumento,dV:float|int|None=None,superior=True,min=None,max=None):
-    if min==None or max==None:
-        min = definirLimites(nomeInstrumento)["leitura"]["min"]
-        max = definirLimites(nomeInstrumento)["leitura"]["max"]
-    
-    if max<min:
-        raise Exception("Valor max menor do que valor min.")
-    if dV==None:
-        dVDefault = [
-            0.01,
-            0.02,
-            0.05,
-            0.1,
-            0.2,
-            0.5,
-            1,
-            2,
-            5,
-            10,
-            20,
-            50]
-        L = abs(max-min)
-        for dVi in sorted(dVDefault):
-            if 0<L/dVi<=10:
-                dV = dVi
-                break
-            else:
-                dV=1
-    if superior:
-        minPerf, maxPerf = (min//dV)*dV-dV,(max//dV)*dV+dV
-        if minPerf<0:
-            minPerf=0
-        return minPerf, maxPerf, dV
-    else:
-        raise Exception("Ainda não foi implementado o superior=False")
 
 def avaliarTrecho (nomeInstrumento,y0=0,yi=10**10,percentiles=[.25,.5,.75]):
     serie:pd.date_range = tratarDados(nomeInstrumento)
