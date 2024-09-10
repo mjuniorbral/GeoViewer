@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from matplotlib.figure import Figure
 from matplotlib.artist import Artist
-from datetime import datetime
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
@@ -160,6 +159,11 @@ def readSheets (file,sheetNames=[]):
     return dataFrames
 
 
+dataFimDefault = pd.Timestamp('2024-07-01')
+
+def analisarLeiturasTipoInstrumento(tipoinstrumento, leituras, listColumns:list = [columnGrandeza,columnUnidade,colunaCodigo,"Estrutura"]):
+    return pd.concat([leituras[leituras[colunaTipo] == tipoinstrumento]])[listColumns].drop_duplicates().dropna()
+
 def get_info_instrument(nameInstrument,df,nameInfo=colunaCodigoCadastro):
     # df : DataFrame do cadastro GEOTEC
     return df[df[colunaCodigoCadastro]==nameInstrument][nameInfo].values[0]
@@ -226,10 +230,6 @@ def exibirLimites(estrutura,tipoInstrumento):
         print(definirLimites(pz))
         print()
 
-month = datetime.today().month
-year = datetime.today().year
-dataFimDefault = pd.Timestamp(day=1,month=month,year=year)
-
 def gerarHistorico(nomeInstrumento,
                    nomeInstrumentoPluv="AGLPL001",
                    dataFim=dataFimDefault,
@@ -258,4 +258,7 @@ def gerarHistorico(nomeInstrumento,
 
 
 
-
+def avaliarTrecho (nomeInstrumento,y0=0,yi=10**10,percentiles=[.25,.5,.75]):
+    serie:pd.date_range = tratarDados(nomeInstrumento)
+    serie = serie[(y0<=serie[nomeInstrumento]) & (serie[nomeInstrumento]<=yi)]
+    return serie.describe(percentiles=percentiles)

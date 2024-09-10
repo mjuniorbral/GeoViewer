@@ -18,10 +18,11 @@ if __name__=="__main__":
     pluviometria = Serie(data,pluv,"bar","Pluviometria","blue",toSecundary=toSecundary)
     
     #Construindo ordem de plotagem
-    series = [manuais,automaticas,pluviometria]
-    # series = [manuais,automaticas]
+    # series = [manuais,automaticas,pluviometria]
+    series = [manuais,automaticas]
     
     #Inicializando, renderizando e salvando o gráfico
+    setup=dict(xlim=(pd.Timestamp('01-05-2022'),pd.Timestamp('31-12-2022')))
     graph = Grafico(series=series)
     graph.render()
     # series = [manuais,automaticas]

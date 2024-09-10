@@ -13,7 +13,9 @@ else:
     from .functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from .annotate import *
 
-plt.rcParams.update({"legend.fontsize":11})
+plt.rcParams["legend.fontsize"] = 11
+plt.rcParams['figure.constrained_layout.use'] = True
+
 X = pd.DataFrame(np.linspace(0.5, 3.5, 20))
 Y = pd.DataFrame(3+np.cos(X))
 
@@ -22,10 +24,20 @@ class Serie():
     def __init__(self,X,Y,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict()) -> None:
         self.data:pd.DataFrame = pd.concat([X,Y],axis=1)
         self.data = self.data.dropna()
+        self.nameX = self.data.columns[0]
         self.X = self.data.iloc[:,0]
+        self.nameY = self.data.columns[1]
         self.Y = self.data.iloc[:,1]
-        self.xLim:tuple = (min(self.X),max(self.X))
-        self.yLim:tuple = (min(self.Y),max(self.Y))
+        if len(self.X)!=0:
+            self.xLim:tuple = (min(self.X),max(self.X))
+        else:
+            self.xLim:tuple = ()
+            
+        if len(self.Y)!=0:
+            self.yLim:tuple = (min(self.Y),max(self.Y))
+        else:
+            self.yLim:tuple = ()
+
         self.axes = []
         self.type = type
         self.color = color
@@ -48,7 +60,7 @@ class Serie():
                 markeredgecolor=None,      # Cor da borda do marcador
                 markeredgewidth=1.0,       # Largura da borda do marcador
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=1,                # Ordem na sobreposição de elementos
+                zorder=1,                  # Ordem na sobreposição de elementos
                 drawstyle='default',       # Estilo de conexão dos pontos ('default', 'steps-pre', etc.)
                 )
         elif self.type == "bar":
@@ -63,14 +75,28 @@ class Serie():
                 hatch=None,                # Padrão de preenchimento (e.g., '/', '\\', 'x', etc.)
                 label=self.label_legend,   # Nome na legenda
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=100,                  # Ordem na sobreposição de elementos
-                log=False,                 # Escala logarítmica no eixo y
+                zorder=100,                # Ordem na sobreposição de elementos
+                # log=False,               # Escala logarítmica no eixo y
                 error_kw=None,             # Parâmetros de erro adicionais para as barras de erro
                 capsize=None,              # Tamanho das extremidades das barras de erro
             )
         self.setup.update(setup)
         pass
 
+    def filterNCopy(self,xmin=None,xmax=None,ymin=None,ymax=None):
+        dataFiltered = self.data
+        if not xmin==None:
+            dataFiltered = dataFiltered[self.data[self.nameX]>xmin]
+        if not xmax==None:
+            dataFiltered = dataFiltered[self.data[self.nameX]<xmax]
+        if not ymin==None:
+            dataFiltered = dataFiltered[self.data[self.nameY]>ymin]
+        if not ymax==None:
+            dataFiltered = dataFiltered[self.data[self.nameY]<ymax]
+        X = dataFiltered[self.nameX]
+        Y = dataFiltered[self.nameY]
+        return Serie(X=X,Y=Y,type=self.type,label=self.label,color=self.color,toSecundary=self.toSecundary,showLegend=self.showLegend,setup=self.setup)
+            
     def render(self,axes:plt.Axes):
         self.axes.append(axes)
         if self.type == "plot":
@@ -82,7 +108,6 @@ class Serie():
                 "linewidth",
                 "alpha",
                 "zorder",
-                "log",
                 "xerr",
                 "yerr",
                 # Exclusive Plot's Params
@@ -105,7 +130,6 @@ class Serie():
                 "linewidth",
                 "alpha",
                 "zorder",
-                "log",
                 "xerr",
                 "yerr",
                 # Exclusive Bar's Params
@@ -124,7 +148,8 @@ class Grafico():
                  series:list[Serie] = [],
                  title:str = "",
                  setup:dict=dict(),
-                 hasSecundary:bool=False
+                 hasSecundary:bool=False,
+                 intervalX = [None,None]
                  ) -> None:
         self.series = series
         self.title = title
@@ -237,29 +262,33 @@ class Grafico():
                 y2Valores.extend(serie.yLim)
             else:
                 yValores.extend(serie.yLim)
-        if isEvery(xValores,pd.Timestamp):
-            self.setup.update(dict(xlim=intervaloPerfeitoData(xValores)))
-        else:
-            self.setup.update(dict(xlim=intervaloPerfeito(xValores)))
-        self.setup.update(dict(ylim = intervaloPerfeito(yValores), y2lim = intervaloPerfeito(y2Valores)))
+        if self.setup["xlim"]==(None,None):
+            if isEvery(xValores,pd.Timestamp):
+                self.setup.update(dict(xlim=intervaloPerfeitoData(xValores)))
+            else:
+                self.setup.update(dict(xlim=intervaloPerfeito(xValores)))
+        if self.setup["ylim"]==(None,None):
+            self.setup.update(dict(ylim = intervaloPerfeito(yValores)))
+        if self.setup["y2lim"]==(None,None):
+            self.setup.update(dict(y2lim = intervaloPerfeito(y2Valores)))
         
         return           
 
     def render(self):
         
-        # Verificar se já foi feito um render anterior
         if self.rendered:
             # Se foi feito, reiniciar objeto self
             Grafico.__init__(self,self.series,self.title,self.setup)
-            # Reiniciando o parâmetro self.rendered
-            self.rendered = False
         
         # Plotting all Serie's entities
         
         for serie in self.series:
+            xmin,xmax = self.setup["xlim"]
             if serie.toSecundary:
+                serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
                 self.objetcsArtist.append(serie.render(self.ax2))
             else:
+                serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
                 self.objetcsArtist.append(serie.render(self.ax))
 
         
@@ -330,10 +359,6 @@ class Grafico():
                 labels += labels2
         self.handles, self.labels = handles, labels
         self.ax.legend(self.handles, self.labels, loc="best", bbox_to_anchor=(0,0,1,1), ncols=5)
-        # self.legend = self.ax.legend(self.handles, self.labels, loc="lower right",bbox_to_anchor=(0,0))
-        # getWindowsArtist(self.ax,self.fig,True)
-        # getWindowsArtist(self.legend,self.fig,True)
-        # annotate(10,10,self.ax)
         
         self.rendered = True
         return
