@@ -143,7 +143,7 @@ class Serie():
             self.art = axes.bar(self.X, self.Y,**kwargs)
         return self.art
         
-class Grafico():
+class Graphic():
     def __init__(self,
                  series:list[Serie] = [],
                  title:str = "",
@@ -278,7 +278,7 @@ class Grafico():
         
         if self.rendered:
             # Se foi feito, reiniciar objeto self
-            Grafico.__init__(self,self.series,self.title,self.setup)
+            Graphic.__init__(self,self.series,self.title,self.setup)
         
         # Plotting all Serie's entities
         
@@ -394,12 +394,12 @@ class Serie3D(Serie):
         super().__init__(X, Y, type, label, toSecundary, showLegend)
 
 
-class Grafico3D(Grafico):
+class Grafico3D(Graphic):
     def __init__(self, series: list[Serie3D], width=7.5, height=7.5) -> None:
         """!!!!!! Ainda não implementado !!!!!!"""
         super().__init__(series, width, height)
 
 if __name__=="__main__":
-    graph = Grafico(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
+    graph = Graphic(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
     graph.render()
     graph.save("1.png")

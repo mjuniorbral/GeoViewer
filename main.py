@@ -23,7 +23,7 @@ if __name__=="__main__":
     
     #Inicializando, renderizando e salvando o gráfico
     setup=dict(xlim=(pd.Timestamp('01-05-2022'),pd.Timestamp('31-12-2022')))
-    graph = Grafico(series=series)
+    graph = Graphic(series=series)
     graph.render()
     # series = [manuais,automaticas]
     # graph.set_series(series)

@@ -18,7 +18,7 @@ series = [Serie(X,Y,label=nomePlanilhaTeste,setup=dict(
 ))]
 
 # Criar um setup padrão de inclinômetro baseado nesse setup, e implementar novas alterações
-graph = Grafico(series,
+graph = Graphic(series,
                 title="Desloc. Eixo - INC02",
                 setup=dict(
                     width = 5,
