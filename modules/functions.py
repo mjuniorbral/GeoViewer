@@ -48,6 +48,14 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
+def importFromGEOTECModel(file,registrationsSheet,measuresSheet):
+    df_global = readSheets(file=file,sheetNames=[registrationsSheet,measuresSheet])
+    cadastro = df_global[registrationsSheet].copy(deep=True)
+    leituras = df_global[measuresSheet].copy(deep=True)
+    columnsRegistrations = list(cadastro.columns)
+    columnsMeasures = list(leituras.columns)
+    return cadastro, leituras, columnsRegistrations, columnsMeasures
+
 def isEvery(iterable,type_):
     for item in iterable:
         if not isinstance(item,type_):

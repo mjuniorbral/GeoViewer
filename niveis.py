@@ -1,6 +1,19 @@
 from modules import *
 import pandas as pd
 
+def fromDataToSerie(nomeInstrumento,df,seco=False,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict()):
+    dados = tratarDados(nomeInstrumento,df,seco=seco)
+    dados = dados.reset_index()
+    if seco:
+        nomeInstrumento+=" (seco)"
+    # print(dados)
+    X = dados.loc[:,columnData]
+    if len(X)==0:
+        print(f"Não há leituras para {nomeInstrumento}")
+        return
+    Y = dados.loc[:,nomeInstrumento]
+    return Serie(X,Y,type,label,color,toSecundary,showLegend,setup)
+
 if __name__=="__main__":
     df = readSheets("Leituras-Monjolo.xlsx")["Planilha1"]
     data = df["Rótulos de Linha"]

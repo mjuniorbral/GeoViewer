@@ -6,7 +6,7 @@ from modules.functions import readSheets
 from modules.classes import *
 import matplotlib.pyplot as plt
 
-planilhas = readSheets("INC02-POR-2024-08.xlsx")
+planilhas = readSheets("data/INC02-POR-2024-08.xlsx")
 nomePlanilhaTeste = "27-08-2024"
 df = planilhas[nomePlanilhaTeste].copy(deep=True)
 df.columns = df.iloc[2]
@@ -41,4 +41,4 @@ graph = Graphic(series,
                     xLabel = "Desloc. Horizontal (m)",
 ))
 graph.render()
-graph.save(path="inc002.png")
+graph.save(path="images/inc002.png")
