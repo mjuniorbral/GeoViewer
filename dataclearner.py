@@ -39,7 +39,7 @@ with pd.ExcelWriter(arquivo_excel, engine='xlsxwriter') as writer:
             month = int(celula.split("/")[0]) # Invertendo
             year = int(celula.split("/")[2])
             data_celula = pd.Timestamp(day=day,month=month,year=year)
-        data_antigo_novo_nome[data_nome] = (nome_antigo,novo_nome,data_celula)
+        data_antigo_novo_nome[data_celula] = (nome_antigo,novo_nome,data_nome)
         text_celula = datetime.date.strftime(data_celula,"%d/%m/%Y")            
         
         print(novo_nome,text_celula,sep="\t")
@@ -48,12 +48,13 @@ with pd.ExcelWriter(arquivo_excel, engine='xlsxwriter') as writer:
     datas = list(data_antigo_novo_nome.keys())
     datas.sort()
     for data in datas:
-        nome_antigo,novo_nome,data_celula = data_antigo_novo_nome[data]
+        nome_antigo,novo_nome,data_nome = data_antigo_novo_nome[data]
         df = dictDF[nome_antigo]
         df.iloc[7,0] = "Data/Hora"
-        df.iloc[7,1] = datetime.date.strftime(data_celula,"%d/%m/%Y")
-        if not data_celula == data:
-            df.iloc[7,4] = "VALOR DIFERENTE DO TÍTULO !!!!!!!!!!!!!!!!!!!"
+        df.iloc[7,1] = datetime.date.strftime(data,"%d/%m/%Y")
+        if not data_nome == data:
+            df.iloc[7,4] = "TÍTULO CORRIGIDO PARA O VALOR DA CÉLULA !!!!!!!!!!!!!!!!!!!"
+            novo_nome = datetime.date.strftime(data,"%d-%m-%y")+"--"
         df.to_excel(writer, sheet_name=novo_nome, index=False)
         continue
     
