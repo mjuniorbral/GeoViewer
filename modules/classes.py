@@ -272,6 +272,10 @@ class Graphic():
         if self.setup["y2lim"]==(None,None):
             self.setup.update(dict(y2lim = intervaloPerfeito(y2Valores)))
         
+        self.xValores = xValores
+        self.yValores = yValores
+        self.y2Valores = y2Valores
+        
         return           
 
     def render(self,toFilter=True):
