@@ -5,15 +5,16 @@ warnings.filterwarnings("ignore")
 from modules.functions import readSheets
 from modules.classes import *
 import matplotlib.pyplot as plt
+import datetime
 
 setup_inclinometro = dict(
-    width = 5,
+    width = 9,
     height = 12,
-    xMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(4)),
+    xMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
     # xMinorFormatter = "",
-    yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
+    yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
     # yMinorFormatter = "",
-    y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
+    y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
     # y2MinorFormatter = "",
     xMajorLocator = AutoLocator(),
     xMinorLocator = AutoMinorLocator(1),
@@ -21,10 +22,19 @@ setup_inclinometro = dict(
     yMajorLocator = AutoLocator(),
     # ylim = (-31,0),
     # xlim = (-0.002,0.002),
-    yLabelFontsize = 10,
+    yLabelFontsize = 12,
     yLabel = "Profundidade (m)",
-    xLabelFontsize = 10,
+    xLabelFontsize = 12,
     xLabel = "Deslococamento (m)",
+    
+    
+    # legend.set_bbox_to_anchor((1.05, 1), loc='upper left', borderaxespad=0.)
+    legendFonteSize = 11,
+    legendNcols = 3,
+    legendBbox_to_anchor = (1.05, 1),
+    legendLoc='upper left',
+    # borderaxespad=0.
+    
 )
 
 dataTree = dict(
@@ -33,7 +43,7 @@ dataTree = dict(
         baseFile = "data/Modelo-INC01.xlsx",
         id_header = 16,
         depth = -46,
-        deslocMax = 20.0
+        deslocMax = 10.0
     ),
     inc002 = dict(
         incName = "INC-02",
@@ -65,7 +75,11 @@ dataTree = dict(
     axisY = {"Depth":"Profundidade (m)"}
 )
 
-lista_inc = ["inc001","inc002","inc002_2"]
+lista_inc = [
+    # "inc001",
+    "inc002",
+    # "inc002_2"
+    ]
 for inc in lista_inc:
     
     baseFile = dataTree[inc]["baseFile"]
@@ -81,8 +95,8 @@ for inc in lista_inc:
         
         xLabel = dataTree["axisX"][axisX]
         series = []
-        alpha = 0.0
-        dAlpha = (1.-alpha)/len(planilhas.keys())
+        alpha = 1
+        nPlanilha = len(planilhas.keys())
         for nomePlanilha in planilhas.keys():
             # print(f"Lendo '{nomePlanilha}' do '{baseFile}'...")
             df = planilhas[nomePlanilha].copy(deep=True)
@@ -92,14 +106,14 @@ for inc in lista_inc:
             X = df[axisX]
             Y = df[axisY]
             nomeSerie = cabecalho.iloc[6,1]
-            serie = Serie(X,Y,label=nomePlanilha,
-                          setup=dict(marker="",linewidth=0.9,alpha=alpha,color="red"),
-                          showLegend=False)
+            serie = Serie(X,Y,label=nomeSerie,
+                          setup=dict(markersize=2,marker="o",linewidth=1.2,alpha=alpha),
+                          showLegend=True)
             series.append(serie)
-            alpha+=dAlpha
+        # alpha*=1/nPlanilha
 
         graph = Graphic(series,
-                        title=f"CONFIRMAR UNIDADES - {dataTree[inc]['incName']}",
+                        title=f"{axisX}-{dataTree[inc]['incName']}",
                         setup=setup_inclinometro)
         graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(-deslocMax,deslocMax)))
         graph.render(False)

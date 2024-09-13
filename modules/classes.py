@@ -4,6 +4,7 @@ import pandas as pd
 from matplotlib.dates import DateFormatter,DayLocator,MonthLocator,YearLocator
 from matplotlib.ticker import AutoLocator,AutoMinorLocator, MultipleLocator,FuncFormatter
 from matplotlib.figure import Figure
+from matplotlib.legend import Legend
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
 if __name__=="__main__":
@@ -197,7 +198,11 @@ class Graphic():
             labelMajorSize = 14,
             labelMinorSize = 10,
             labelMajorColor = "black",
-            labelMinorColor = "black",                
+            labelMinorColor = "black",
+            legendFonteSize = 12,
+            legendLoc="best",
+            legendBbox_to_anchor=(0,0,1,1),
+            legendNcols=5
         )
         self.setup.update(setup)
         self.rendered = False
@@ -364,8 +369,8 @@ class Graphic():
                 handles += handles2
                 labels += labels2
         self.handles, self.labels = handles, labels
-        self.ax.legend(self.handles, self.labels, loc="best", bbox_to_anchor=(0,0,1,1), ncols=5)
-        
+        self.legend:Legend = self.ax.legend(self.handles, self.labels, loc=self.setup["legendLoc"], bbox_to_anchor=self.setup["legendBbox_to_anchor"], ncols=self.setup["legendNcols"], fontsize=self.setup["legendFonteSize"])
+        self.fig.tight_layout()
         self.rendered = True
         return
 
@@ -387,8 +392,8 @@ class Graphic():
     def set_title(self,title:str):
         self.title = title
 
-    def save (self,path:str,dpi=500):
-        self.fig.savefig(path,dpi=dpi)
+    def save (self,path:str,dpi=500,bbox_inches='tight'):
+        self.fig.savefig(path,dpi=dpi,bbox_inches=bbox_inches)
     
     def show (self,warn=True):
         self.fig.show(warn=warn)
