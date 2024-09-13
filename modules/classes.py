@@ -274,7 +274,7 @@ class Graphic():
         
         return           
 
-    def render(self):
+    def render(self,toFilter=True):
         
         if self.rendered:
             # Se foi feito, reiniciar objeto self
@@ -285,10 +285,12 @@ class Graphic():
         for serie in self.series:
             xmin,xmax = self.setup["xlim"]
             if serie.toSecundary:
-                serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
+                if toFilter:
+                    serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
                 self.objetcsArtist.append(serie.render(self.ax2))
             else:
-                serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
+                if toFilter:
+                    serie = serie.filterNCopy(**dict(xmin=xmin,xmax=xmax))
                 self.objetcsArtist.append(serie.render(self.ax))
 
         
