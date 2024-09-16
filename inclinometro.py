@@ -29,6 +29,7 @@ setup_inclinometro = dict(
     legendNcols = 3,
     legendBbox_to_anchor = (1.05, 1),
     legendLoc='upper left',
+    labelTitleFontsize = 14,
 )
 
 dataTree = dict(
