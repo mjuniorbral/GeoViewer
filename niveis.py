@@ -15,7 +15,7 @@ def fromDataToSerie(nomeInstrumento,df,seco=False,type="plot",label=None,color=N
     return Serie(X,Y,type,label,color,toSecundary,showLegend,setup)
 
 if __name__=="__main__":
-    df = readSheets("Leituras-Monjolo.xlsx")["Planilha1"]
+    df = readSheets("data/Leituras-Monjolo.xlsx",showLog=False)["Planilha1"]
     data = df["Rótulos de Linha"]
     pluv = df["AGLPL001"]
     leiturasAutomatizadas = df["AGLBRMRR002_A"]
