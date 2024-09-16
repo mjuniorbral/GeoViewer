@@ -35,7 +35,8 @@ if __name__=="__main__":
     # series = [manuais,automaticas]
     
     #Inicializando, renderizando e salvando o gráfico
-    setup=dict(xlim=(pd.Timestamp(day=1,month=11,year=2023),pd.Timestamp(day=1,month=7,year=2024)))
+    # Definindo período de interesse (2,5 anos hidrológicos no mínimo)
+    setup=dict(xlim=(pd.Timestamp(day=1,month=4,year=2022),pd.Timestamp(day=1,month=9,year=2024)))
     graph = Graphic(
         series=series,
         setup=setup,
