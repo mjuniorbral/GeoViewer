@@ -203,7 +203,7 @@ class Graphic():
             legendLoc="best",
             legendBbox_to_anchor=(0,0,1,1),
             legendNcols=5,
-            labelTitleFontsize = 10
+            labelTitleFontsize = 16
         )
         self.setup.update(setup)
         self.rendered = False
