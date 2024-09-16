@@ -1,3 +1,8 @@
+import time
+start_time = time.time()
+print("Programa iniciado")
+
+import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
@@ -5,7 +10,6 @@ warnings.filterwarnings("ignore")
 from modules.functions import readSheets
 from modules.classes import *
 import matplotlib.pyplot as plt
-import datetime
 
 setup_inclinometro = dict(
     width = 9,
@@ -88,7 +92,6 @@ lista_inc = [
     "inc002_2"
     ]
 
-print("Programa iniciado")
 
 for inc in lista_inc:
     
@@ -139,4 +142,6 @@ for inc in lista_inc:
         graph.render(False)
         # print(min(graph.xValores),max(graph.xValores))
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png")
-        print(f"Imagem salva: images/incGrafico/{inc}-{axisX}.png")
+        print(f"[{datetime.datetime.now().strftime("%d/%m/%Y - %h:%m:%s")}] Imagem salva: images/incGrafico/{inc}-{axisX}.png")
+end_time = time.time()
+print(f"Programa finalizado em {end_time-start_time:.5f} segs.\n")
