@@ -42,12 +42,14 @@ dataTree = dict(
         incName = "INC-01",
         baseFile = "data/Modelo-INC01.xlsx",
         id_header = 16,
+        blacklist = [],
         depth = -46,
         deslocMax = 10.0
     ),
     inc002 = dict(
         incName = "INC-02",
         baseFile = "data/Modelo-INC02.xlsx",
+        blacklist = ["12/04/2022"],
         id_header = 16,
         depth = -28,
         deslocMax = 20.0
@@ -55,6 +57,7 @@ dataTree = dict(
     inc002_2 = dict(
         incName = "INC-02",
         baseFile = "data/Modelo-INC02-2.xlsx",
+        blacklist = [],
         id_header = 16,
         depth = -31,
         deslocMax = 1.5
@@ -83,6 +86,7 @@ lista_inc = [
 for inc in lista_inc:
     
     baseFile = dataTree[inc]["baseFile"]
+    blacklist = dataTree[inc]["blacklist"]
     id_header = dataTree[inc]["id_header"]
     depth = dataTree[inc]["depth"]
     deslocMax = dataTree[inc]["deslocMax"]
@@ -106,6 +110,9 @@ for inc in lista_inc:
             X = df[axisX]
             Y = df[axisY]
             nomeSerie = cabecalho.iloc[6,1]
+            if (str(nomeSerie) in blacklist) or ("desconsiderar" in nomePlanilha.lower()):
+                print(f"Planilha '{nomePlanilha}' desconsiderada.")
+                continue
             serie = Serie(X,Y,label=nomeSerie,
                           setup=dict(markersize=2,marker="o",linewidth=1.2,alpha=alpha),
                           showLegend=True)
