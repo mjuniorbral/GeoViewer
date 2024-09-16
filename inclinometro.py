@@ -143,6 +143,6 @@ for inc in lista_inc:
         graph.render(False)
         # print(min(graph.xValores),max(graph.xValores))
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png")
-        print(f"[{datetime.datetime.now().strftime("%d/%m/%Y - %h:%m:%s")}] Imagem salva: images/incGrafico/{inc}-{axisX}.png")
+        print(f"[{datetime.datetime.now().strftime('%d/%m/%Y - %h:%m:%s')}] Imagem salva: images/incGrafico/{inc}-{axisX}.png")
 end_time = time.time()
 print(f"Programa finalizado em {end_time-start_time:.5f} segs.\n")
