@@ -44,7 +44,11 @@ dataTree = dict(
         id_header = 16,
         blacklist = [],
         depth = -46,
-        deslocMax = 10.0
+        deslocMax = 20.0,
+        checksumMax = 1,
+        desvioMax = 1,
+        facemax = 1,
+        perfilmax = 600,
     ),
     inc002 = dict(
         incName = "INC-02",
@@ -52,7 +56,11 @@ dataTree = dict(
         blacklist = ["12/04/2022"],
         id_header = 16,
         depth = -28,
-        deslocMax = 20.0
+        deslocMax = 20.0,
+        checksumMax = 1,
+        desvioMax = 1,
+        facemax = 1,
+        perfilmax = 600,
     ),
     inc002_2 = dict(
         incName = "INC-02",
@@ -60,28 +68,35 @@ dataTree = dict(
         blacklist = [],
         id_header = 16,
         depth = -31,
-        deslocMax = 1.5
+        deslocMax = 20,
+        checksumMax = 1,
+        desvioMax = 1,
+        facemax = 1,
+        perfilmax = 600,
     ),
     
     axisX = {
-        "desloc_A":"Deslocamento  - eixo A (mm)",
-        "desloc_B":"Deslocamento  - eixo B (mm)",
-        # "Checksum A":"Checksum - eixo A (mm)",
-        # "Checksum B":"Checksum - eixo B (mm)",
-        # "desvio_A":"Desvio (mm) - eixo A",
-        # "desvio_B":"Desvio (mm) - eixo B",
-        # "face_A+_mm":"Leitura A+ (mm)",
-        # "face_A-_mm":"Leitura A- (mm)",
-        # "face_B+_mm":"Leitura B+ (mm)",
-        # "face_B-_mm":"Leitura B- (mm)"
+        # "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 20),
+        # "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 20),
+        # "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
+        # "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
+        # "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
+        # "desvio_B":dict(label="Desvio (mm) - eixo B", xmax = 20),
+        # "face_A+_mm":dict(label="Leitura A+ (mm)", xmax = 20),
+        # "face_A-_mm":dict(label="Leitura A- (mm)", xmax = 20),
+        # "face_B+_mm":dict(label="Leitura B+ (mm)", xmax = 20),
+        # "face_B-_mm":dict(label="Leitura B- (mm)", xmax = 20),
+        
+        "perfil_A":dict(label="Perfil A - (mm)", xmax = 600),
+        "perfil_B":dict(label="Perfil B - (mm)", xmax = 600),
     },
     axisY = {"Depth":"Profundidade (m)"}
 )
 
 lista_inc = [
-    # "inc001",
+    "inc001",
     "inc002",
-    # "inc002_2"
+    "inc002_2"
     ]
 for inc in lista_inc:
     
@@ -90,6 +105,10 @@ for inc in lista_inc:
     id_header = dataTree[inc]["id_header"]
     depth = dataTree[inc]["depth"]
     deslocMax = dataTree[inc]["deslocMax"]
+    checksumMax = dataTree[inc]["checksumMax"]
+    desvioMax = dataTree[inc]["desvioMax"]
+    facemax = dataTree[inc]["facemax"]
+    perfilmax = dataTree[inc]["perfilmax"]
     axisY = list(dataTree["axisY"].keys())[0]
     yLabel = dataTree["axisY"][axisY]
     
@@ -97,7 +116,7 @@ for inc in lista_inc:
     
     for axisX in dataTree["axisX"].keys():
         
-        xLabel = dataTree["axisX"][axisX]
+        xLabel = dataTree["axisX"][axisX]["label"]
         series = []
         alpha = 1
         nPlanilha = len(planilhas.keys())
@@ -110,6 +129,8 @@ for inc in lista_inc:
             X = df[axisX]
             Y = df[axisY]
             nomeSerie = cabecalho.iloc[6,1]
+            if not isinstance(nomeSerie,str):
+                nomeSerie = cabecalho.iloc[6,1].strftime("%d/%m/%Y")
             if (str(nomeSerie) in blacklist) or ("desconsiderar" in nomePlanilha.lower()):
                 print(f"Planilha '{nomePlanilha}' desconsiderada.")
                 continue
@@ -122,7 +143,9 @@ for inc in lista_inc:
         graph = Graphic(series,
                         title=f"{axisX}-{dataTree[inc]['incName']}",
                         setup=setup_inclinometro)
-        graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(-deslocMax,deslocMax)))
+        xmin = -dataTree["axisX"][axisX]["xmax"]
+        xmax = +dataTree["axisX"][axisX]["xmax"]
+        graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(xmin,xmax)))
         graph.render(False)
         print(min(graph.xValores),max(graph.xValores))
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png")
