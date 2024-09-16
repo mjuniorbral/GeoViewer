@@ -35,9 +35,12 @@ if __name__=="__main__":
     # series = [manuais,automaticas]
     
     #Inicializando, renderizando e salvando o gráfico
-    setup=dict(xlim=(pd.Timestamp('01-05-2022'),pd.Timestamp('31-12-2022')))
-    graph = Graphic(series=series)
-    graph.render()
+    setup=dict(xlim=(pd.Timestamp(day=1,month=11,year=2023),pd.Timestamp(day=1,month=7,year=2024)))
+    graph = Graphic(
+        series=series,
+        setup=setup,
+        )
+    graph.render(toFilter=False)
     # series = [manuais,automaticas]
     # graph.set_series(series)
     # graph.render()
