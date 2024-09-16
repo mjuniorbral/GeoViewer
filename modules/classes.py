@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.legend import Legend
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
+import datetime
 if __name__=="__main__":
     from functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from annotate import *
@@ -393,8 +394,9 @@ class Graphic():
     def set_title(self,title:str):
         self.title = title
 
-    def save (self,path:str,dpi=500,bbox_inches='tight'):
+    def save (self,path:str,dpi=500,bbox_inches='tight',showLog=False):
         self.fig.savefig(path,dpi=dpi,bbox_inches=bbox_inches)
+        print(f"[{datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')}] Imagem salva: {path}") if showLog else 0
     
     def show (self,warn=True):
         self.fig.show(warn=warn)
