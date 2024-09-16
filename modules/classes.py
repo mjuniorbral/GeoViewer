@@ -145,7 +145,7 @@ class Serie():
             self.art = axes.bar(self.X, self.Y,**kwargs)
         return self.art
     def __repr__(self):
-        return str(self.data)
+        return f"Serie (label={self.label},showLegend={self.showLegend},color={self.color})\n{str(self.data)}"
         
 class Graphic():
     def __init__(self,
