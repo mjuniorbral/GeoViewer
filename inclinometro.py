@@ -11,30 +11,20 @@ setup_inclinometro = dict(
     width = 9,
     height = 12,
     xMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
-    # xMinorFormatter = "",
     yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
-    # yMinorFormatter = "",
     y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
-    # y2MinorFormatter = "",
     xMajorLocator = AutoLocator(),
     xMinorLocator = AutoMinorLocator(1),
     yMinorLocator = AutoMinorLocator(),
     yMajorLocator = AutoLocator(),
-    # ylim = (-31,0),
-    # xlim = (-0.002,0.002),
     yLabelFontsize = 12,
     yLabel = "Profundidade (m)",
     xLabelFontsize = 12,
     xLabel = "Deslococamento (m)",
-    
-    
-    # legend.set_bbox_to_anchor((1.05, 1), loc='upper left', borderaxespad=0.)
     legendFonteSize = 11,
     legendNcols = 3,
     legendBbox_to_anchor = (1.05, 1),
     legendLoc='upper left',
-    # borderaxespad=0.
-    
 )
 
 dataTree = dict(
@@ -76,17 +66,16 @@ dataTree = dict(
     ),
     
     axisX = {
-        # "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 20),
-        # "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 20),
-        # "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
-        # "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
-        # "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
-        # "desvio_B":dict(label="Desvio (mm) - eixo B", xmax = 20),
-        # "face_A+_mm":dict(label="Leitura A+ (mm)", xmax = 20),
-        # "face_A-_mm":dict(label="Leitura A- (mm)", xmax = 20),
-        # "face_B+_mm":dict(label="Leitura B+ (mm)", xmax = 20),
-        # "face_B-_mm":dict(label="Leitura B- (mm)", xmax = 20),
-        
+        "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 20),
+        "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 20),
+        "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
+        "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
+        "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
+        "desvio_B":dict(label="Desvio (mm) - eixo B", xmax = 20),
+        "face_A+_mm":dict(label="Leitura A+ (mm)", xmax = 20),
+        "face_A-_mm":dict(label="Leitura A- (mm)", xmax = 20),
+        "face_B+_mm":dict(label="Leitura B+ (mm)", xmax = 20),
+        "face_B-_mm":dict(label="Leitura B- (mm)", xmax = 20),
         "perfil_A":dict(label="Perfil A - (mm)", xmax = 600),
         "perfil_B":dict(label="Perfil B - (mm)", xmax = 600),
     },
@@ -98,6 +87,9 @@ lista_inc = [
     "inc002",
     "inc002_2"
     ]
+
+print("Programa iniciado")
+
 for inc in lista_inc:
     
     baseFile = dataTree[inc]["baseFile"]
@@ -112,7 +104,7 @@ for inc in lista_inc:
     axisY = list(dataTree["axisY"].keys())[0]
     yLabel = dataTree["axisY"][axisY]
     
-    planilhas = readSheets(baseFile)
+    planilhas = readSheets(baseFile,showLog=False)
     
     for axisX in dataTree["axisX"].keys():
         
@@ -121,7 +113,7 @@ for inc in lista_inc:
         alpha = 1
         nPlanilha = len(planilhas.keys())
         for nomePlanilha in planilhas.keys():
-            # print(f"Lendo '{nomePlanilha}' do '{baseFile}'...")
+            # print(f"Lendo '{nomePlanilha}' do '{baseFile}'")
             df = planilhas[nomePlanilha].copy(deep=True)
             cabecalho = df.iloc[0:id_header]
             df.columns = df.iloc[id_header]
@@ -132,14 +124,12 @@ for inc in lista_inc:
             if not isinstance(nomeSerie,str):
                 nomeSerie = cabecalho.iloc[6,1].strftime("%d/%m/%Y")
             if (str(nomeSerie) in blacklist) or ("desconsiderar" in nomePlanilha.lower()):
-                print(f"Planilha '{nomePlanilha}' desconsiderada.")
+                # print(f"Planilha '{nomePlanilha}' desconsiderada.")
                 continue
             serie = Serie(X,Y,label=nomeSerie,
                           setup=dict(markersize=2,marker="o",linewidth=1.2,alpha=alpha),
                           showLegend=True)
             series.append(serie)
-        # alpha*=1/nPlanilha
-
         graph = Graphic(series,
                         title=f"{axisX}-{dataTree[inc]['incName']}",
                         setup=setup_inclinometro)
@@ -147,5 +137,6 @@ for inc in lista_inc:
         xmax = +dataTree["axisX"][axisX]["xmax"]
         graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(xmin,xmax)))
         graph.render(False)
-        print(min(graph.xValores),max(graph.xValores))
+        # print(min(graph.xValores),max(graph.xValores))
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png")
+        print(f"Imagem salva: images/incGrafico/{inc}-{axisX}.png")
