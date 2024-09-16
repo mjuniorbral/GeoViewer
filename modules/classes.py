@@ -144,6 +144,8 @@ class Serie():
                 "error_kw"])
             self.art = axes.bar(self.X, self.Y,**kwargs)
         return self.art
+    def __repr__(self):
+        return str(self.data)
         
 class Graphic():
     def __init__(self,
