@@ -155,16 +155,16 @@ def criarDiretorio (relativePath:str) -> None:
         os.mkdir(relativePath)
     return
 
-def readSheets (file,sheetNames=[]):
-    print(f"Abrindo o arquivo {file}")
-    print(f"Esse processo pode demorar 1 ou 2 minutos...")
+def readSheets (file,sheetNames=[],showLog=True):
+    print(f"Abrindo o arquivo {file}") if showLog else None
+    print(f"Esse processo pode demorar 1 ou 2 minutos...")  if showLog else None
     if len(sheetNames)==0:
-        print(f"Lendo as planilhas do arquivo {file}")
+        print(f"Lendo as planilhas do arquivo {file}") if showLog else None
         dataFrames = pd.read_excel(file,sheet_name=None)
     else:
-        print(f"Lendo as planilhas {sheetNames} do arquivo {file}")
+        print(f"Lendo as planilhas {sheetNames} do arquivo {file}")  if showLog else None
         dataFrames = {sheetName:pd.read_excel(file,sheetName) for sheetName in sheetNames}
-    print("O arquivo foi importado com sucesso.")
+    print("O arquivo foi importado com sucesso.")  if showLog else None
     return dataFrames
 
 
