@@ -285,7 +285,7 @@ class Graphic():
         
         return           
 
-    def render(self,toFilter=True):
+    def render(self,toFilter=False):
         
         if self.rendered:
             # Se foi feito, reiniciar objeto self
