@@ -202,7 +202,8 @@ class Graphic():
             legendFonteSize = 12,
             legendLoc="best",
             legendBbox_to_anchor=(0,0,1,1),
-            legendNcols=5
+            legendNcols=5,
+            labelTitleFontsize = 10
         )
         self.setup.update(setup)
         self.rendered = False
@@ -354,7 +355,7 @@ class Graphic():
             self.ax2.margins(self.setup["ax2Margins"])
         # Set Title
         if len(self.title):
-            self.ax.set_title(self.title, fontsize=20, verticalalignment='bottom')
+            self.ax.set_title(self.title, fontsize=self.setup["labelTitleFontsize"], verticalalignment='bottom')
 
         # Set Legend
         handles1, labels1 = self.ax.get_legend_handles_labels()
