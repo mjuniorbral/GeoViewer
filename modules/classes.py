@@ -418,4 +418,4 @@ class Grafico3D(Graphic):
 if __name__=="__main__":
     graph = Graphic(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
     graph.render()
-    graph.save("1.png")
+    graph.save("1.png",showLog=True)
