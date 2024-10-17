@@ -5,7 +5,7 @@ from modules import importFromGEOTECModel,readSheets,tratarDados,columnData,Seri
 import warnings
 warnings.filterwarnings('ignore')
 
-file = "data\leituras-janeiro2022-agosto2024.xlsx"
+file = "data\leituras-janeiro2024-agosto2024.xlsx"
 registrationsSheet = "Cadastro Agosto2024"
 measuresSheet = "Resumo"
 cadastro, leituras, columnsRegistrations, columnsMeasures = importFromGEOTECModel(file,registrationsSheet,measuresSheet)
