@@ -163,7 +163,11 @@ def readSheets (file,sheetNames=[],showLog=True):
         dataFrames = pd.read_excel(file,sheet_name=None)
     else:
         print(f"Lendo as planilhas {sheetNames} do arquivo {file}")  if showLog else None
-        dataFrames = {sheetName:pd.read_excel(file,sheetName) for sheetName in sheetNames}
+        dataFrames = {}
+        for sheetName in sheetNames:
+            print(f"Iniciando leitura {sheetName}")
+            dataFrames[sheetName] = pd.read_excel(file,sheetName)
+            print(f"Leitura finalizada {sheetName}")
     print("O arquivo foi importado com sucesso.")  if showLog else None
     return dataFrames
 
@@ -174,6 +178,9 @@ def get_info_instrument(nameInstrument,df,nameInfo=colunaCodigoCadastro):
 
 def tratarDados(nomeInstrumento:str,df:pd.DataFrame,dataInicio:pd.Timestamp|None=None,dataFim:pd.Timestamp|None=None,seco:bool=False):
     leiturasFiltradas = df.copy(deep=True)
+    print(leiturasFiltradas)
+    if colunaCodigo not in leiturasFiltradas.columns:
+        print("Não está nas colunas")
     leiturasFiltradas = leiturasFiltradas[leiturasFiltradas[colunaCodigo]==nomeInstrumento][leiturasFiltradas[colunaSituacaoMedicao]=="Realizada"][leiturasFiltradas[colunaOutlier]!="Sim"]
     if seco:
         leiturasFiltradas = leiturasFiltradas[leiturasFiltradas["Condição Adversa"]=="SECO"]
