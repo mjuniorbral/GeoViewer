@@ -177,8 +177,11 @@ def get_info_instrument(nameInstrument,df,nameInfo=colunaCodigoCadastro):
     return df[df[colunaCodigoCadastro]==nameInstrument][nameInfo].values[0]
 
 def tratarDados(nomeInstrumento:str,df:pd.DataFrame,dataInicio:pd.Timestamp|None=None,dataFim:pd.Timestamp|None=None,seco:bool=False):
+    if not isinstance(df,pd.DataFrame):
+        print(df)
+        raise AttributeError()
     leiturasFiltradas = df.copy(deep=True)
-    print(leiturasFiltradas)
+    # print(leiturasFiltradas)
     if colunaCodigo not in leiturasFiltradas.columns:
         print("Não está nas colunas")
     leiturasFiltradas = leiturasFiltradas[leiturasFiltradas[colunaCodigo]==nomeInstrumento][leiturasFiltradas[colunaSituacaoMedicao]=="Realizada"][leiturasFiltradas[colunaOutlier]!="Sim"]
