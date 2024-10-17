@@ -1,5 +1,5 @@
 import pandas as pd
-from modules import *
+from modules import importFromGEOTECModel,readSheets,tratarDados,columnData,Serie,Graphic
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
