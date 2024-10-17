@@ -39,17 +39,24 @@ for grafico in graphSetting["Nome do gráfico"]:
         df_instr = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]
         if not df_instr["Render"].values:
             continue
-        leituras = fromDataToSerie(nomeInstrumento=instrumento,
-                                    df=df_instr["Instrumentos"],
-                                    seco=False,
-                                    type=df_instr["Tipo"],
-                                    label=df_instr["Instrumentos"],
-                                    color=df_instr["Cor"],
-                                    toSecundary=df_instr["Eixo Secundário"],
-                                    showLegend=True,
-                                    setup=dict(marker="",linestyle="-"),
-                                    # juntarAutomatizado=df_instr["Unir com automatizado"],
-                                    )
+        nomeInstrumento=df_instr["Instrumentos"].values[0]
+        df=leituras
+        seco=False
+        type=df_instr["Tipo"].values[0]
+        label=df_instr["Instrumentos"].values[0]
+        color=df_instr["Cor"].values[0]
+        toSecundary=df_instr["Eixo Secundário"].values[0]
+        showLegend=True
+        setup=dict(marker="",linestyle="-")
+        serie = fromDataToSerie(nomeInstrumento=nomeInstrumento,
+                                    df=df,
+                                    seco=seco,
+                                    type=type,
+                                    label=label,
+                                    color=color,
+                                    toSecundary=toSecundary,
+                                    showLegend=showLegend,
+                                    setup=setup)
         # if df_instr["Verificar seco"]:
         #     leituras_manuais_secas = fromDataToSerie(nomeInstrumento=instrumento,
         #                                 df=df_instr["Instrumentos"],
