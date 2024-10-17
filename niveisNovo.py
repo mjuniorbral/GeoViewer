@@ -34,6 +34,7 @@ for grafico in graphSetting["Nome do gráfico"]:
     print(f"Construindo \"{grafico}\"")
     filterGrafico = seriesSetting["Nome do gráfico"]==grafico
     seriesToPlot = seriesSetting[filterGrafico]
+    list_series = []
     for instrumento in seriesToPlot["Instrumentos"].values:
         print(f"\t{instrumento}")
         df_instr = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]
@@ -67,3 +68,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         #                                 toSecundary=df_instr["Eixo Secundário"],
         #                                 showLegend=False,
         #                                 setup=dict(marker="x",linestyle=""))
+        list_series.append(serie)
+    df_graph = graphSetting[graphSetting["Nome do gráfico"]==grafico]
+    title = df_graph["Nome do gráfico"].values[0]
+    xInicial = df_graph["Data Inicial"].values[0]
+    xFinal = df_graph["Data Final"].values[0]
+    hasSecundary = True # Considerando que todos os gráficos de níveis tem pluviometria, está sendo posto em Hardcode esse parâmetro
+    # setup_grafico = dict(xlim=(pd.Timestamp(day=1,month=4,year=2022),pd.Timestamp(day=1,month=9,year=2024)))
+    setup_grafico = dict(xlim=(xInicial,xFinal))
+    graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
+    graph.render(toFilter=False)
+    graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
