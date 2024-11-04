@@ -285,7 +285,7 @@ class Graphic():
         self.yValores = yValores
         self.y2Valores = y2Valores
         
-        return           
+        return
 
     def render(self,toFilter=False):
         
@@ -384,7 +384,7 @@ class Graphic():
         return self.objetcsArtist
 
     def set_series(self,series:list[Serie]):
-        self.serie = series
+        self.series = series
     def append_series(self,newSeries:Serie):
         self.series.append(newSeries)
     def extend_series(self,newSeries:list[Serie]):
