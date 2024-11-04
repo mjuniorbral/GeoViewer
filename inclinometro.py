@@ -174,8 +174,8 @@ dataTree = dict(
     ),
     
     axisX = {
-        "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 20),
-        "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 20),
+        "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 8), # Valor anterior 20 (alterado em 04/11/2024)
+        "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 8), # Valor anterior 20 (alterado em 04/11/2024)
         # "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
         # "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
         # "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
