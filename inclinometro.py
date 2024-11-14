@@ -115,21 +115,21 @@ series_para_ocultar = [
     ]
 
 setup_inclinometro = dict(
-    width = 9,
+    width = 6, # Antes: 9 (atualizado em 04/11/2024)
     height = 12,
     xMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
     yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
     y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)),
-    xMajorLocator = AutoLocator(),
-    xMinorLocator = AutoMinorLocator(5),
-    yMinorLocator = AutoMinorLocator(10),
-    yMajorLocator = AutoLocator(),
+    xMajorLocator = MultipleLocator(4), # Antes: AutoLocator() (atualizado em 04/11/2024)
+    xMinorLocator = AutoMinorLocator(2), # Antes: AutoMinorLocator(5) (atualizado em 04/11/2024)
+    yMajorLocator = MultipleLocator(5), # Antes: AutoLocator() (atualizado em 04/11/2024)
+    yMinorLocator = AutoMinorLocator(1), # Antes: AutoMinorLocator(10) (atualizado em 04/11/2024)
     yLabelFontsize = 12,
     yLabel = "Profundidade (m)",
     xLabelFontsize = 12,
     xLabel = "Deslococamento (m)",
     legendFonteSize = 11,
-    legendNcols = 3,
+    legendNcols = 1, # Antes: 3 (atualizado em 04/11/2024) - Foi diminuido de 3 para 1 por causa do filtro de datas do gráfico, por isso não há necessidade de tantas colunas
     legendBbox_to_anchor = (1.05, 1),
     legendLoc='upper left',
     labelTitleFontsize = 14,
