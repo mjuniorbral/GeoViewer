@@ -298,3 +298,11 @@ def separador(path_csv,sep=","):
     finally:
         arquivo.close()
     return "\n".join(out_lines)
+
+def retornarCaminhoAbsoluto():
+    return os.getcwd()
+
+def retornarCaminhoRelativo(caminhoAbsoluto:str=""):
+    if not caminhoAbsoluto:
+        caminhoAbsoluto = retornarCaminhoAbsoluto()    
+    return os.path.dirname(os.path.realpath(caminhoAbsoluto))
