@@ -91,6 +91,18 @@ class Serie():
         dataFiltered = dataFiltered[dataFiltered[self.nameX]>=max(interval)]
         return (min(dataFiltered[self.nameY]),max(dataFiltered[self.nameY]))
     
+    def verificarLeituras(self,ymin,ymax):
+        minimo = min(self.data[self.nameY])
+        maximo = max(self.data[self.nameY])
+        retorno = True
+        if minimo<ymin:
+            print(f"Medição {minimo} < limite {ymin}")
+            retorno = False
+        if maximo>ymax:
+            print(f"Medição {maximo} > limite {ymax}")
+            retorno = False
+        return retorno
+    
     def filterNCopy(self,xmin=None,xmax=None,ymin=None,ymax=None):
         dataFiltered = self.data
         if not xmin==None:
