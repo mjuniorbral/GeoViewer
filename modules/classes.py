@@ -270,6 +270,8 @@ class Graphic():
         y2Valores = []
 
         for serie in series:
+            if serie == None:
+                continue
             xValores.extend(serie.xLim)
             if serie.toSecundary:
                 y2Valores.extend(serie.yLim)
