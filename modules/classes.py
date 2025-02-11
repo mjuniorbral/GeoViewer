@@ -421,6 +421,8 @@ class Grafico3D(Graphic):
         """!!!!!! Ainda não implementado !!!!!!"""
         super().__init__(series, width, height)
 
+EMPTY_SERIE_SECO = Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle=""))
+
 if __name__=="__main__":
     graph = Graphic(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
     graph.render()
