@@ -78,9 +78,11 @@ for grafico in graphSetting["Nome do gráfico"]:
     for instrumento in seriesToPlot["Instrumentos"].values:
         renderizarSerie = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]["Render"].values[0]
         if renderizarSerie:
-            print(f"\t{instrumento}")
+            # print(f"\t{instrumento}")
+            ...
         else:
-            print(f"\t{instrumento} não será renderizado")
+            # print(f"\t{instrumento} não será renderizado")
+            ...
             continue
             
         df_instr = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]
@@ -150,7 +152,7 @@ for grafico in graphSetting["Nome do gráfico"]:
                 continue
             listaMins.append(min(serie.X))
     xInicial = min(intervaloPerfeitoData(listaMins))
-    print(xInicial)
+    # print(xInicial)
     xMajorLocator = MonthLocator(interval=int(nMonthLocator))
     if nMonthLocator==6:
         xMajorLocator = MonthLocator(bymonth=(1,7))
@@ -182,7 +184,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         setup_grafico.update(dict(
             y2lim=(y2Inicial,y2Final)
         ))
-    print(setup_grafico)
+    # print(setup_grafico)
     
     if hasSecos:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
