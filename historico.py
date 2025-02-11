@@ -23,7 +23,7 @@ DFT_PARSE_DATES = [
 
 PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\Config-Graficos_MON.xlsx"
+PATH_CONFIG = "data\Historico\Config-Graficos_DIO-Historico.xlsx"
 
 # print("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
@@ -141,8 +141,20 @@ for grafico in graphSetting["Nome do gráfico"]:
     y2Inicial = df_graph["Y2 Inicial"].values[0]
     y2Final = df_graph["Y2 Final"].values[0]
     hasSecos = df_graph["Tem Seco"].values[0]
+    nMonthLocator = df_graph["Distância em Meses dos Tickers"].values[0]    
     
-    
+    listaMins = []
+    if pd.isna(xInicial):
+        for serie in list_series:
+            if serie.label == "AGLPL001":
+                continue
+            listaMins.append(min(serie.X))
+    xInicial = min(intervaloPerfeitoData(listaMins))
+    print(xInicial)
+    xMajorLocator = MonthLocator(interval=int(nMonthLocator))
+    if nMonthLocator==6:
+        xMajorLocator = MonthLocator(bymonth=(1,7))
+
     hasSecundary = True # Considerando que todos os gráficos de níveis tem pluviometria, está sendo posto em Hardcode esse parâmetro
     
     # setup_grafico = dict(xlim=(pd.Timestamp(day=1,month=4,year=2022),pd.Timestamp(day=1,month=9,year=2024)))
@@ -153,6 +165,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         legendFonteSize = 10,
         legendBbox_to_anchor = (0.5,-0.25),
         # legendNcols = 6,
+        xMajorLocator = xMajorLocator,
         legendLoc='upper center',
         xLabelFontsize = 10,
         yLabelFontsize = 10,
