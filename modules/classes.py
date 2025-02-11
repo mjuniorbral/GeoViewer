@@ -84,7 +84,11 @@ class Serie():
             )
         self.setup.update(setup)
         pass
-
+    def getYLim(self,interval:list|tuple):
+        dataFiltered = self.data.copy()
+        dataFiltered = dataFiltered[dataFiltered[self.nameX]>=min(interval)]
+        dataFiltered = dataFiltered[dataFiltered[self.nameX]>=max(interval)]
+        return (min(dataFiltered[self.nameY]),max(dataFiltered[self.nameY]))
     def filterNCopy(self,xmin=None,xmax=None,ymin=None,ymax=None):
         dataFiltered = self.data
         if not xmin==None:
