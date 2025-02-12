@@ -53,6 +53,9 @@ leituras = df_mod.copy(deep=True)
 end_time = time.time()
 print(f"Dados carregados em {end_time-start_time:.5f} segs.\n")
 
+start_time = time.time()
+print("Iniciando construção dos gráficos...")
+
 
 def fromDataToSerie(nomeInstrumento,df,seco=False,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict(),juntarAutomatizado=False):
     dados = tratarDados(nomeInstrumento,df,seco=seco)
@@ -210,3 +213,5 @@ for grafico in graphSetting["Nome do gráfico"]:
     graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
     # graph.render(toFilter=False)
     # graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
+end_time = time.time()
+print(f"Gráficos construídos em {end_time-start_time:.5f} segs.\n")
