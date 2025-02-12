@@ -45,12 +45,14 @@ df_mod = df.merge(cadastro[["Código", "Cota do Fundo (m)"]],left_on="Código do
 df_mod["Valor Final"] = np.where(df_mod["Condição Adversa"]=="SECO", df_mod["Cota do Fundo (m)"], df_mod["Valor"])
 
 leituras = df_mod.copy(deep=True)
+
+# piezometros = cadastro[cadastro["Tipo de Instrumento"]=="Piezômetro"].dropna(axis=1)
+# tipos = cadastro["Tipo de Instrumento"].drop_duplicates().to_list()
+# colunasCadastro = cadastro.columns.to_list()
+
 end_time = time.time()
 print(f"Dados carregados em {end_time-start_time:.5f} segs.\n")
 
-piezometros = cadastro[cadastro["Tipo de Instrumento"]=="Piezômetro"].dropna(axis=1)
-tipos = cadastro["Tipo de Instrumento"].drop_duplicates().to_list()
-colunasCadastro = cadastro.columns.to_list()
 
 def fromDataToSerie(nomeInstrumento,df,seco=False,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict(),juntarAutomatizado=False):
     dados = tratarDados(nomeInstrumento,df,seco=seco)
