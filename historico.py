@@ -116,6 +116,12 @@ for grafico in graphSetting["Nome do gráfico"]:
         if not pd.isna(outlier_max):
             df_filtered = df_filtered[df_filtered["Valor Final"]<outlier_max]
         
+        cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
+        if nomeInstrumento in ["AGLBDIGPZ012_A"]:
+            leiturasRetiradas = df_filtered[df_filtered["Valor Final"]<cotaFundo]
+            print(f"Datas retiradas do instrumento {nomeInstrumento}:\n{leiturasRetiradas[leiturasRetiradas['Código do Instrumento']==nomeInstrumento]['Data de Medição'].drop_duplicates()}")
+            df_filtered = df_filtered[df_filtered["Valor Final"]>=cotaFundo]
+        
         serie = fromDataToSerie(nomeInstrumento=nomeInstrumento,
                                     df=df_filtered,
                                     seco=False,
