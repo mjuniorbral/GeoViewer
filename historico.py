@@ -217,7 +217,8 @@ for grafico in graphSetting["Nome do gráfico"]:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
     
     graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
-    # graph.render(toFilter=False)
-    # graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
+    graph.render(toFilter=False)
+    graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
+
 end_time = time.time()
 print(f"Gráficos construídos em {end_time-start_time:.5f} segs.\n")
