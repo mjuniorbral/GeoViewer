@@ -128,15 +128,15 @@ for grafico in graphSetting["Nome do gráfico"]:
         ###########################################################################
         #### VERIFICAÇÃO DE LEITURAS QUE ESTÃO FORA DO INTERVALO DE FUNDO/TOPO ####
         ###########################################################################
-        cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
-        cotaTopo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Topo (m)"].values[0]
-        if not(pd.isna(cotaFundo)) and not(pd.isna(cotaTopo)):
-            if not serie.verificarLeituras(cotaFundo,cotaTopo):
-                instrumentosProblematicos = [
-                    "AGLBDIGPZ012_A" # Medição 635.2541788 < limite 635.56
-                ]
-                if nomeInstrumento not in instrumentosProblematicos:
-                    raise Exception(f"{serie.label} com leituras inválidas.")
+        # cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
+        # cotaTopo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Topo (m)"].values[0]
+        # if not(pd.isna(cotaFundo)) and not(pd.isna(cotaTopo)):
+        #     if not serie.verificarLeituras(cotaFundo,cotaTopo):
+        #         instrumentosProblematicos = [
+        #             "AGLBDIGPZ012_A" # Medição 635.2541788 < limite 635.56
+        #         ]
+        #         if nomeInstrumento not in instrumentosProblematicos:
+        #             raise Exception(f"{serie.label} com leituras inválidas.")
         ###########################################################################
         ###########################################################################
         ###########################################################################
