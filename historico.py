@@ -110,12 +110,16 @@ for grafico in graphSetting["Nome do gráfico"]:
             setup=dict(marker=marker,markersize=3,linestyle="-")
             
         
+        # Resetar a leitura para cada instrumento
         df_filtered = leituras.copy(deep=True)
+        
+        # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
         if not pd.isna(outlier_max):
             df_filtered = df_filtered[df_filtered["Valor Final"]<outlier_max]
         if not pd.isna(outlier_max):
             df_filtered = df_filtered[df_filtered["Valor Final"]<outlier_max]
         
+        # Retirada das leituras abaixo da cota de Fundo
         cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
         if nomeInstrumento in ["AGLBDIGPZ012_A"]:
             leiturasRetiradas = df_filtered[df_filtered["Valor Final"]<cotaFundo]
