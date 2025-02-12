@@ -23,7 +23,7 @@ DFT_PARSE_DATES = [
 
 PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\Config-Graficos_DIO-Historico.xlsx"
+PATH_CONFIG = "data\Historico\Config-Graficos_DIO-Historico-Individual.xlsx"
 
 # print("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
