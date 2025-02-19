@@ -23,7 +23,7 @@ DFT_PARSE_DATES = [
 
 PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\Config-Graficos_DIO-Historico-Individual.xlsx"
+PATH_CONFIG = "data\Historico\Config-Graficos_MON-Historico.xlsx"
 
 # print("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
@@ -121,7 +121,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Retirada das leituras abaixo da cota de Fundo
         cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
-        if nomeInstrumento in ["AGLBDIGPZ012_A"]:
+        if nomeInstrumento in ["AGLBDIGPZ012_A","AGLBRMPZ006"]:
             leiturasRetiradas = df_filtered[df_filtered["Valor Final"]<cotaFundo]
             print(f"Datas retiradas do instrumento {nomeInstrumento}:\n{leiturasRetiradas[leiturasRetiradas['Código do Instrumento']==nomeInstrumento]['Data de Medição'].drop_duplicates()}")
             df_filtered = df_filtered[df_filtered["Valor Final"]>=cotaFundo]
@@ -138,15 +138,16 @@ for grafico in graphSetting["Nome do gráfico"]:
         ###########################################################################
         #### VERIFICAÇÃO DE LEITURAS QUE ESTÃO FORA DO INTERVALO DE FUNDO/TOPO ####
         ###########################################################################
-        # cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
-        # cotaTopo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Topo (m)"].values[0]
-        # if not(pd.isna(cotaFundo)) and not(pd.isna(cotaTopo)):
-        #     if not serie.verificarLeituras(cotaFundo,cotaTopo):
-        #         instrumentosProblematicos = [
-        #             "AGLBDIGPZ012_A" # Medição 635.2541788 < limite 635.56
-        #         ]
-        #         if nomeInstrumento not in instrumentosProblematicos:
-        #             raise Exception(f"{serie.label} com leituras inválidas.")
+        cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
+        cotaTopo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Topo (m)"].values[0]
+        if not(pd.isna(cotaFundo)) and not(pd.isna(cotaTopo)):
+            if not serie.verificarLeituras(cotaFundo,cotaTopo):
+                instrumentosProblematicos = [
+                    "AGLBDIGPZ012_A", # Medição 635.2541788 < limite 635.56
+                    "AGLBRMPZ006" # Medição 643.198 < limite 643.52
+                ]
+                if nomeInstrumento not in instrumentosProblematicos:
+                    raise Exception(f"{serie.label} com leituras inválidas.")
         ###########################################################################
         ###########################################################################
         ###########################################################################
