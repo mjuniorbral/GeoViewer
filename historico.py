@@ -23,7 +23,7 @@ DFT_PARSE_DATES = [
 
 PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\Config-Graficos_MON-Historico.xlsx"
+PATH_CONFIG = "data\Historico\Config-Graficos_EDMJ-Historico-Individual.xlsx"
 
 # print("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
@@ -119,12 +119,31 @@ for grafico in graphSetting["Nome do gráfico"]:
         if not pd.isna(outlier_max):
             df_filtered = df_filtered[df_filtered["Valor Final"]<outlier_max]
         
-        # Retirada das leituras abaixo da cota de Fundo
+        instrumentosProblematicos = [
+            "AGLBDIGPZ012_A", # Medição 635.2541788 < limite 635.56
+            "AGLBRMPZ006", # Medição 643.198 < limite 643.52
+            "AGLEDMPZ003_A", # Medição 955.9489035 > limite 860.354
+            "AGLEDMPZ004_A", # Medição 996.9196595 > limite 843.051
+            "AGLEDMPZ005_A", # Medição 813.6301204 < limite 813.845 & Medição 868.7457174 > limite 843.165
+            "AGLEDMPZ006_A", # Medição 787.0252079 < limite 797.88
+            "AGLEDMPZ007_A", # Medição 600.3071088 < limite 825.017 & Medição 1199.470392 > limite 877.017
+            "AGLEDMPZ024_A", # Medição 1070.303131 > limite 900.718
+            "AGLEDMPZ028_A", # Medição 844.5427838 < limite 853.494
+            "AGLPRMNA002", # Medição 826.69 < limite 826.735
+            "AGLPRMNA004", # Medição 833.914 < limite 834.238
+            "AGLPRMNA005", # Medição 824.915 < limite 825.039
+            "AGLPRMNA007", # Medição 823.685 < limite 824.097
+            "AGLPRMNA009_A", # Medição 995.577116 > limite 877.02
+            "AGLPRMNA013", # Medição 857.192 < limite 857.26
+                ]
+        #################################################
+        # Retirada das leituras abaixo da cota de Fundo #
         cotaFundo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Fundo (m)"].values[0]
-        if nomeInstrumento in ["AGLBDIGPZ012_A","AGLBRMPZ006"]:
+        if nomeInstrumento in instrumentosProblematicos:
             leiturasRetiradas = df_filtered[df_filtered["Valor Final"]<cotaFundo]
             print(f"Datas retiradas do instrumento {nomeInstrumento}:\n{leiturasRetiradas[leiturasRetiradas['Código do Instrumento']==nomeInstrumento]['Data de Medição'].drop_duplicates()}")
             df_filtered = df_filtered[df_filtered["Valor Final"]>=cotaFundo]
+        #################################################
         
         serie = fromDataToSerie(nomeInstrumento=nomeInstrumento,
                                     df=df_filtered,
@@ -142,11 +161,8 @@ for grafico in graphSetting["Nome do gráfico"]:
         cotaTopo = cadastro[cadastro["Código"]==nomeInstrumento]["Cota do Topo (m)"].values[0]
         if not(pd.isna(cotaFundo)) and not(pd.isna(cotaTopo)):
             if not serie.verificarLeituras(cotaFundo,cotaTopo):
-                instrumentosProblematicos = [
-                    "AGLBDIGPZ012_A", # Medição 635.2541788 < limite 635.56
-                    "AGLBRMPZ006" # Medição 643.198 < limite 643.52
-                ]
                 if nomeInstrumento not in instrumentosProblematicos:
+                    # print(f"{serie.label} com leituras inválidas.")
                     raise Exception(f"{serie.label} com leituras inválidas.")
         ###########################################################################
         ###########################################################################
@@ -165,7 +181,7 @@ for grafico in graphSetting["Nome do gráfico"]:
                                         setup=dict(marker="x",linestyle=""))
             if leituras_manuais_secas != None:
                 list_series.append(leituras_manuais_secas)
-    df_graph = graphSetting[graphSetting["Nome do gráfico"]==grafico]
+    df_graph:pd.DataFrame = graphSetting[graphSetting["Nome do gráfico"]==grafico]
     title = df_graph["Nome do gráfico"].values[0]
     xInicial = df_graph["Data Inicial"].values[0]
     xFinal = df_graph["Data Final"].values[0]
