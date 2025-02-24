@@ -6,10 +6,6 @@ Data: 02/01/2024
 
 ESTRUTURA DE PASTA E ARQUIVOS
 
-pastas
-| data: arquivos brutos do GEOTEC da VALE
-| results: arquivos do resumo do cadastro pós tratamento do programa
-
 arquivos
 | main.py: programa principal que deve ser executado
 | const.py: valores de referência para o programa ser rodado
