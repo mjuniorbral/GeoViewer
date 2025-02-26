@@ -2,7 +2,8 @@ import pandas as pd
 import os
 from matplotlib.figure import Figure
 from matplotlib.artist import Artist
-from datetime import datetime
+from datetime import datetime,time
+
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
@@ -48,6 +49,14 @@ instrumentoToEixo = {
     "Poço": "",
     }
 
+def dropNone(iterable):
+    retorno = []
+    for i in iterable:
+        if i==None:
+            continue
+        retorno.append(i)
+    return retorno
+
 def importFromGEOTECModel(file,registrationsSheet,measuresSheet):
     df_global = readSheets(file=file,sheetNames=[registrationsSheet,measuresSheet])
     cadastro = df_global[registrationsSheet].copy(deep=True)
@@ -63,6 +72,7 @@ def isEvery(iterable,type_):
     return True
 
 def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max_=None,returndV=False):
+    valores = tuple(dropNone(valores))
     if len(valores)==0:
         return (None,None)
     if min_==None:
@@ -93,6 +103,7 @@ def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max
         raise Exception("Ainda não foi implementado o superior=False")
 
 def intervaloPerfeitoData(datas,dV=None,superior=True,min_=None,max_=None):
+    datas = tuple(dropNone(datas))
     if len(datas)==0:
         return (None,None)
     if dV!=None:
@@ -306,3 +317,56 @@ def retornarCaminhoRelativo(caminhoAbsoluto:str=""):
     if not caminhoAbsoluto:
         caminhoAbsoluto = retornarCaminhoAbsoluto()    
     return os.path.dirname(os.path.realpath(caminhoAbsoluto))
+
+def pegarValor(df:pd.DataFrame,column):
+    if len(df)>1:
+        raise("Dataframe com mais de um elemento para ser extraído")
+    return df[column].values[0]
+
+def reduzir_a_um(lista):
+    serie = pd.Series(lista).dropna()
+    lista = serie[serie!=None].to_list()
+    if len(lista)>1:
+        raise Exception("Função reduzir_a_um não pode finalizar. Há dois valores válidos")
+    elif len(lista)==1:
+        return lista[0]
+    else:
+        return None
+
+def timeToTimedelta(time:time) -> pd.Timestamp:
+    if isinstance(time,float):
+        return pd.Timestamp(0)
+    elif pd.isnull(time):
+        return pd.Timestamp(0)
+
+    hours = time.hour
+    minutes = time.minute
+    seconds = time.second
+    microseconds = time.microsecond
+    return pd.Timedelta(
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds,
+        microseconds=microseconds
+    )
+
+def somar_data_e_hora(data:pd.Series,hora:pd.Series):
+    retorno = []
+    if len(data)==len(hora):
+        for i in data.index:
+            if pd.isnull(data[i]):
+                raise Exception(f"[###] Data {data[i]} é não válido")
+            if pd.isnull(hora[i]):
+                retorno.append(data[i])
+    raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
+    return retorno
+
+def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
+    if pd.isnull(valorAVerifica):
+        return valorParaRetornar
+    elif pd.isna(valorAVerifica):
+        return valorParaRetornar
+    elif valorAVerifica==None:
+        return valorParaRetornar
+    else:
+        return valorAVerifica
