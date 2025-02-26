@@ -8,6 +8,7 @@ from matplotlib.legend import Legend
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
 import datetime
+from log import log
 if __name__=="__main__":
     from functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from annotate import *
@@ -96,10 +97,10 @@ class Serie():
         maximo = max(self.data[self.nameY])
         retorno = True
         if minimo<ymin:
-            print(f"Medição {minimo} < limite {ymin}")
+            log.info(f"Medição {minimo} < limite {ymin}")
             retorno = False
         if maximo>ymax:
-            print(f"Medição {maximo} > limite {ymax}")
+            log.info(f"Medição {maximo} > limite {ymax}")
             retorno = False
         return retorno
     
@@ -238,7 +239,7 @@ class Graphic():
             
             # User Warning
             if "rectFigureBaseAdd_axes" in setup.keys():
-                print("User Warning: setup['rectFigureBaseAdd_axes'] não foi usado pois self.setup['figureAutoLayout']==True. Aconselha-se alterar o setup['figureAutoLayout'] para False.")
+                log.warning("User Warning: setup['rectFigureBaseAdd_axes'] não foi usado pois self.setup['figureAutoLayout']==True. Aconselha-se alterar o setup['figureAutoLayout'] para False.")
         
         else:
             # Figure
@@ -418,7 +419,7 @@ class Graphic():
 
     def save (self,path:str,dpi=500,bbox_inches='tight',showLog=False):
         self.fig.savefig(path,dpi=dpi,bbox_inches=bbox_inches)
-        print(f"[{datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')}] Imagem salva: {path}") if showLog else 0
+        log.info(f"[{datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')}] Imagem salva: {path}") if showLog else 0
     
     def show (self,warn=True):
         self.fig.show(warn=warn)
