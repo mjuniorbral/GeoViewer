@@ -197,7 +197,7 @@ class Graphic():
             yMajorLocator = AutoLocator(),
             yMinorLocator = AutoMinorLocator(2),
             y2MajorLocator = AutoLocator(),
-            y2MinorLocator = AutoMinorLocator(1),
+            y2MinorLocator = AutoMinorLocator(5),
             invertSidesYAxis = False,
             figureAutoLayout = True,
             grid = True,
