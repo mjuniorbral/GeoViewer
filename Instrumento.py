@@ -113,6 +113,17 @@ class Instrumento():
         self.leituras_jorrantes = df_mod[df_mod["Condição Adversa"]=="JORRANTE"]
         self.leituras_nao_secas = df_mod[isna(df_mod["Condição Adversa"])]
         
+        if (self.fundo_ou_base,self.topo)==(None,)*2:
+            log.warning(f"Instrumento {self.codigo} sem cadastro de topo e base/fundo.")
+        elif self.topo != None:
+            self.leituras_acima_topo = df_mod[df_mod["Valor"]>self.topo]
+            df_mod = df_mod[df_mod["Valor"]<=self.topo]
+            log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_acima_topo)} abaixo da cota de topo.")
+        elif self.fundo_ou_base != None:
+            self.leituras_abaixo_base = df_mod[df_mod["Valor"]<self.fundo_ou_base]
+            df_mod = df_mod[df_mod["Valor"]>=self.fundo_ou_base]
+            log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_abaixo_base)} abaixo da cota de base/fundo.")
+
         self.leituras_validas = df_mod.copy()
         self.n_secos = len(self.leituras_secas)
         self.n_leituras_validas = len(self.leituras_validas)
@@ -129,13 +140,6 @@ class Instrumento():
             self.leituras_acima_nv_controle = df_mod[df_mod["Valor"]>=self.atencao]
         elif self.emergencia != None:
             self.leituras_acima_nv_controle = df_mod[df_mod["Valor"]>=self.emergencia]
-        
-        if (self.fundo_ou_base,self.topo)==(None,)*2:
-            log.info(f"Instrumento {self.codigo} sem cadastro de topo e base/fundo.")
-        elif self.topo != None:
-            self.leituras_acima_topo = df_mod[df_mod["Valor"]>self.topo]
-        elif self.fundo_ou_base != None:
-            self.leituras_abaixo_base = df_mod[df_mod["Valor"]<self.fundo_ou_base]
         
         self.data_maxima = self.leituras_validas["Data de Medição"].max()
         self.data_minima = self.leituras_validas["Data de Medição"].min()
