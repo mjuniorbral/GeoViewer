@@ -109,7 +109,6 @@ setups_series_niveis_notaveis = {
         ),
 }
 
-log.setLevel("CRITICAL")
 timer_load.set_time_marker()
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
@@ -130,13 +129,14 @@ for grafico in graphSetting["Nome do gráfico"]:
     seriesToPlot:pd.DataFrame = seriesSetting[filterGrafico]
     list_series: list[Serie]= []
     for instrumento in seriesToPlot["Instrumentos"].values:
+        log.info(f"Definindo série de \"{instrumento}\" =============================")
         # Extraindo dados sobre o instrumento a ser renderizado nessa iteração
         df_instr:pd.DataFrame = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]
         
         renderizarSerie = df_instr["Render"].values[0]
         if not renderizarSerie:
             # Avisando os instrumentos que não serão renderizados 
-            log.debug(f"\t{instrumento} não será renderizado no gráfico {grafico}")
+            log.info(f"\t{instrumento} não foi posto para ser renderizado no gráfico {grafico} conforme tabela de configuração.")
             continue
         
         # Isolando os dados do df_instr em variável do programa para melhorar a trabalhabilidade
@@ -178,8 +178,8 @@ for grafico in graphSetting["Nome do gráfico"]:
         try:
             instrumento_obj = Instrumento(cadastro_instrumento.to_dict(orient="records")[0])
         except Exception as m:
-            print(cadastro_instrumento.values)
-            print(f"{instrumento}: {m}")
+            log.critical(f"ERRO FATAL NO {instrumento}: {m}. Ele não será renderizado")
+            log.critical(cadastro_instrumento.values)
             continue
         instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
@@ -392,10 +392,12 @@ for grafico in graphSetting["Nome do gráfico"]:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
-    
+    log.debug("HEY!--------------------")
     # Construindo o gráfico, renderizando e salvando
     graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
     graph.render(toFilter=False)
+    log.debug(list_series)
     graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
+    log.info(f"\"{grafico}\" finalizado. =============================")
 
 timer_load.get_delta_time_from_time_marker()
