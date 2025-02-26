@@ -35,9 +35,9 @@ DFT_PARSE_DATES = [
     "Hora da Medição"
     ]
 
-PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
-PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\CONFIG\Config-Graficos_EDMJ-Historico-Individual.xlsx"
+PATH_LEITURAS = "data\Historico\Historico-Jan2025\Historico-até-01-FEV-2025.csv"
+PATH_CADASTRO = "data\Historico\Historico-Jan2025\\2298_Instrumento-01-02-2025-154527.xlsx"
+PATH_CONFIG = "data\Historico\Historico-Jan2025\Config-Graficos_DIO-Historico.xlsx"
 
 log.info("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
