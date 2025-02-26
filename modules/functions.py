@@ -3,7 +3,7 @@ import os
 from matplotlib.figure import Figure
 from matplotlib.artist import Artist
 from datetime import datetime,time
-
+from log import log
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
@@ -117,17 +117,17 @@ def intervaloPerfeito_old2(valores,
                       dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100)):
     """Substitui a função intervaloPerfeito_old anterior"""
     valores = tuple(dropNone(valores))
-    print(valores) #############################################################
+    log.debug(valores) #############################################################
     if len(valores)==0:
         return (None,None)
     min_ = min(valores)
     max_ = max(valores)
-    print(min_,max_) #############################################################
+    log.debug(min_,max_) #############################################################
     L = float(abs(max_-min_))
-    print(L) #############################################################
+    log.debug(L) #############################################################
     dVDefault = sorted(dVDefault)
     dV = dVDefault[retornaIndexProx(L/nDiv,dVDefault)]
-    print(dV) #############################################################
+    log.debug(dV) #############################################################
     correcao = 1
     if min_%dV==0:
         correcao = 0
@@ -143,21 +143,21 @@ def intervaloPerfeito(valores,
                       dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100)):
     """Substitui a função intervaloPerfeito_old2 anterior"""
     valores = tuple(dropNone(valores))
-    print(valores) #############################################################
+    log.debug(valores) #############################################################
     if len(valores)==0:
         return (None,None)
     min_ = min(valores)
     max_ = max(valores)
-    print(min_,max_) #############################################################
+    log.debug(min_,max_) #############################################################
     L = float(abs(max_-min_))
-    print(L) #############################################################
+    log.debug(L) #############################################################
     dVDefault = sorted(dVDefault,reverse=True)
     for dVi in dVDefault:
-        print(f"{L}/{dVi}={L/dVi}")
+        log.debug(f"{L}/{dVi}={L/dVi}")
         if L/dVi>nDiv:
             dV=dVi
             break
-    print(dV) #############################################################
+    log.debug(dV) #############################################################
     correcao = 1
     if min_%dV==0:
         correcao = 0
@@ -247,17 +247,17 @@ def pullValues(dict:dict,keys:list):
             dictToReturn.update({key:value})
     return dictToReturn
         
-def getWindowsArtist(artist:Artist,fig:Figure,print_=False):
+def getWindowsArtist(artist:Artist,fig:Figure,log.debug_=False):
     # Obtendo a posição e o tamanho do artist
     bbox = artist.get_window_extent()
     
     # Convertendo as coordenadas de janela para coordenadas da figura
     bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
 
-    if print_:
+    if log.debug_:
         # Imprimindo a posição e o tamanho
-        print(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
-        print(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
+        log.debug(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
+        log.debug(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
     return bbox
 
 def criarDiretorio (relativePath:str) -> None:
@@ -266,19 +266,19 @@ def criarDiretorio (relativePath:str) -> None:
     return
 
 def readSheets (file,sheetNames=[],showLog=True):
-    print(f"Abrindo o arquivo {file}") if showLog else None
-    print(f"Esse processo pode demorar 1 ou 2 minutos...")  if showLog else None
+    log.debug(f"Abrindo o arquivo {file}") if showLog else None
+    log.debug(f"Esse processo pode demorar 1 ou 2 minutos...")  if showLog else None
     if len(sheetNames)==0:
-        print(f"Lendo as planilhas do arquivo {file}") if showLog else None
+        log.debug(f"Lendo as planilhas do arquivo {file}") if showLog else None
         dataFrames = pd.read_excel(file,sheet_name=None)
     else:
-        print(f"Lendo as planilhas {sheetNames} do arquivo {file}")  if showLog else None
+        log.debug(f"Lendo as planilhas {sheetNames} do arquivo {file}")  if showLog else None
         dataFrames = {}
         for sheetName in sheetNames:
-            print(f"Iniciando leitura {sheetName}")
+            log.debug(f"Iniciando leitura {sheetName}")
             dataFrames[sheetName] = pd.read_excel(file,sheetName)
-            print(f"Leitura finalizada {sheetName}")
-    print("O arquivo foi importado com sucesso.")  if showLog else None
+            log.debug(f"Leitura finalizada {sheetName}")
+    log.debug("O arquivo foi importado com sucesso.")  if showLog else None
     return dataFrames
 
 
@@ -288,12 +288,12 @@ def get_info_instrument(nameInstrument,df,nameInfo=colunaCodigoCadastro):
 
 def tratarDados(nomeInstrumento:str,df:pd.DataFrame,dataInicio:pd.Timestamp|None=None,dataFim:pd.Timestamp|None=None,seco:bool=False):
     if not isinstance(df,pd.DataFrame):
-        print(df)
+        log.debug(df)
         raise AttributeError()
     leiturasFiltradas = df.copy(deep=True)
-    # print(leiturasFiltradas)
+    # log.debug(leiturasFiltradas)
     if colunaCodigo not in leiturasFiltradas.columns:
-        print("Não está nas colunas")
+        log.debug("Não está nas colunas")
     leiturasFiltradas = leiturasFiltradas[leiturasFiltradas[colunaCodigo]==nomeInstrumento][leiturasFiltradas[colunaSituacaoMedicao]=="Realizada"][leiturasFiltradas[colunaOutlier]!="Sim"]
     if seco:
         leiturasFiltradas = leiturasFiltradas[leiturasFiltradas["Condição Adversa"]=="SECO"]
@@ -350,9 +350,9 @@ def listarInstrumentos(estrutura="",tipoInstrumento="",df:pd.DataFrame=pd.DataFr
 def exibirLimites(estrutura,tipoInstrumento):
     pzs = listarInstrumentos(estrutura=estrutura,tipoInstrumento=tipoInstrumento)
     for pz in pzs:
-        print(pz)
-        print(definirLimites(pz))
-        print()
+        log.debug(pz)
+        log.debug(definirLimites(pz))
+        log.debug()
 
 month = datetime.today().month
 year = datetime.today().year
