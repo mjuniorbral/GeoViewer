@@ -57,6 +57,10 @@ def dropNone(iterable):
     for i in iterable:
         if i==None:
             continue
+        if pd.isna(i):
+            continue
+        if pd.isnull(i):
+            continue
         retorno.append(i)
     return retorno
 
