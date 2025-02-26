@@ -8,11 +8,12 @@ from matplotlib.legend import Legend
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
 import datetime
-from log import log
 if __name__=="__main__":
+    from log import log
     from functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from annotate import *
 else:
+    from .log import log
     from .functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
     from .annotate import *
 
