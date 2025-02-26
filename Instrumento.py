@@ -86,10 +86,11 @@ class Instrumento():
             try:
                 log.critical(f"Função somar_data_e_hora foi usada no {self.codigo}")
                 df_mod["Data/Hora"] = somar_data_e_hora(df_mod["Data de Medição"], df_mod["Hora da Medição"])
+                raise Exception()
             except Exception as m:
                 if "###" in str(m):
-                    print(self.codigo)
-                    print(df_mod.to_string())
+                    log.critical(self.codigo)
+                    log.critical(df_mod.to_string())
                     raise Exception()
         
         self.leituras_nao_realizada = df_mod[df_mod["Situação da Medição"]=="Não Realizada"]
@@ -118,10 +119,10 @@ class Instrumento():
         try:
             self.porcentagem_seco = self.n_secos/float(self.n_leituras_validas)
         except ZeroDivisionError:
-            log.info(f"{self.codigo} não possui leituras.")
+            log.warning(f"{self.codigo} não possui leituras.")
         
         if (self.atencao,self.alerta,self.emergencia)==(None,)*3:
-            log.info(f"Instrumento {self.codigo} sem cadastro de níveis de controle.")
+            log.warning(f"Instrumento {self.codigo} sem cadastro de níveis de controle.")
         elif self.atencao != None:
             self.leituras_acima_nv_controle = df_mod[df_mod["Valor"]>=self.atencao]
         elif self.alerta != None:
