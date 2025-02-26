@@ -67,8 +67,10 @@ class Instrumento():
         self.leituras_acima_topo = df_vazio.copy()
         self.leituras_abaixo_base = df_vazio.copy()
         self.registro_unico_diario = True
+        self.possui_leituras = True
         
         if df_mod.shape[0]==0:
+            self.possui_leituras = False
             self.registro_unico_diario = False
             log.info(f"{self.codigo} sem leituras em seu Leitura.df_leituras")
             return
@@ -131,6 +133,7 @@ class Instrumento():
             self.porcentagem_seco = self.n_secos/float(self.n_leituras_validas)
         except ZeroDivisionError:
             log.warning(f"{self.codigo} não possui leituras.")
+            self.possui_leituras = False
         
         if (self.atencao,self.alerta,self.emergencia)==(None,)*3:
             log.warning(f"Instrumento {self.codigo} sem cadastro de níveis de controle.")
