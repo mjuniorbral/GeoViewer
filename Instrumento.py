@@ -117,14 +117,21 @@ class Instrumento():
         
         if (self.fundo_ou_base,self.topo)==(None,)*2:
             log.warning(f"Instrumento {self.codigo} sem cadastro de topo e base/fundo.")
-        elif self.topo != None:
-            self.leituras_acima_topo = df_mod[df_mod["Valor"]>self.topo]
-            df_mod = df_mod[df_mod["Valor"]<=self.topo]
-            log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_acima_topo)} abaixo da cota de topo.")
-        elif self.fundo_ou_base != None:
-            self.leituras_abaixo_base = df_mod[df_mod["Valor"]<self.fundo_ou_base]
-            df_mod = df_mod[df_mod["Valor"]>=self.fundo_ou_base]
-            log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_abaixo_base)} abaixo da cota de base/fundo.")
+        else:
+            if self.topo != None:
+                self.leituras_acima_topo = df_mod[df_mod["Valor"]>self.topo]
+                df_mod = df_mod[df_mod["Valor"]<=self.topo]
+                log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_acima_topo)} acima da cota de topo.")
+            else:
+                log.warning(f"Instrumento {self.codigo} sem cadastro de topo.")
+                
+            if self.fundo_ou_base != None:
+                self.leituras_abaixo_base = df_mod[df_mod["Valor"]<self.fundo_ou_base]
+                df_mod = df_mod[df_mod["Valor"]>=self.fundo_ou_base]
+                log.warning(f"Instrumento {self.codigo} possui {len(self.leituras_abaixo_base)} abaixo da cota de base/fundo.")
+            else:
+                log.warning(f"Instrumento {self.codigo} sem cadastro de base/fundo.")
+                
 
         self.leituras_validas = df_mod.copy()
         self.n_secos = len(self.leituras_secas)
