@@ -14,10 +14,11 @@ class Timer():
         if name_marker == "":
             name_marker = self.recent_time_marker
         if name_marker in self.time_markers.keys():
+            name_marker.rstrip("|")
             for i in range(len(self.time_markers)):
-                if f"{name_marker} ({i+1})" in self.time_markers.keys():
+                if f"{name_marker}{'|'*(i+1)}" in self.time_markers.keys():
                     continue
-                name_marker = f"{name_marker} ({i+1})"
+                name_marker = f"{name_marker}{'|'*(i+1)}"
                 break
         self.time_markers[name_marker] = time()
         self.recent_time_marker = name_marker
