@@ -370,3 +370,13 @@ def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
         return valorParaRetornar
     else:
         return valorAVerifica
+    
+def monthByInterval(n):
+    if 12%n!=0:
+        return (False,(),n)
+    tupla = ()
+    cont = 1
+    while cont<13:
+        tupla+=(cont,)
+        cont+=n
+    return (True,tupla,n)
