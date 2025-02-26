@@ -181,7 +181,7 @@ relacaoCabecalho = {
     "Nível de Emergência no eixo Y (Maior que)": None,
     "Nível de Alerta no eixo Z (Maior que)": None,
     "Nível de Alerta no eixo X (Maior que)": None,
-    "Nível de Atenção no vetor deslocamento (Maior que)": None,
+    "Nível de Atenção no vetor deslocamento (Maior que)": "Nível de Atenção",
     "Nível de Atenção no eixo X (Maior que)": None,
     "Nível de Atenção no eixo Y (Maior que)": None,
     "Nível de Atenção no eixo Z (Maior que)": None,
