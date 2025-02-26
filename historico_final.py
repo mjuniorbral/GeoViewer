@@ -182,6 +182,9 @@ for grafico in graphSetting["Nome do gráfico"]:
             log.critical(cadastro_instrumento.values)
             continue
         instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
+        if not instrumento_obj.possui_leituras:
+            log.warning(f"Instrumento {instrumento_obj.codigo} não possui leitura, por isso não será renderizado.")
+            continue
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
