@@ -190,6 +190,7 @@ def intervaloPerfeito(valores,
     if max_%dV==0:
         correcao = 0
     maxPerf = ((max_//dV)+correcao)*dV
+    log.debug((minPerf, maxPerf), dV)
     return (minPerf, maxPerf), dV
 
 def monthByInterval(n):
