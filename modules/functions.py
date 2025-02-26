@@ -64,6 +64,22 @@ def dropNone(iterable):
         retorno.append(i)
     return retorno
 
+def minimoValido (iterable):
+    iterable = dropNone(iterable)
+    if len(iterable)==0:
+        return
+    else:
+        return min(iterable)
+
+def maximoValido (iterable):
+    iterable = dropNone(iterable)
+    if len(iterable)==0:
+        return
+    else:
+        return max(iterable)
+    
+    
+
 def importFromGEOTECModel(file,registrationsSheet,measuresSheet):
     df_global = readSheets(file=file,sheetNames=[registrationsSheet,measuresSheet])
     cadastro = df_global[registrationsSheet].copy(deep=True)
