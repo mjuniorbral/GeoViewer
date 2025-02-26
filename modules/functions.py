@@ -91,6 +91,7 @@ def importFromGEOTECModel(file,registrationsSheet,measuresSheet):
 def isEvery(iterable,type_):
     for item in iterable:
         if not isinstance(item,type_):
+            log.critical(f"Valor {item} não é o type {type_}, mas sim do tipo {type(item)}")
             return False
     return True
 
