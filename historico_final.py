@@ -7,7 +7,7 @@ log.info("Iniciando carregamento de dados...")
 
 import pandas as pd
 from modules.classes import *
-from modules import readSheets,tratarDados,columnData,Serie,Graphic,retornarValorNaoNulo
+from modules import readSheets,tratarDados,columnData,Serie,Graphic,retornarValorNaoNulo,monthByInterval,intervaloPerfeitoDataMes
 from modules.agCadastro import UnirCadastroGEOTEC
 from Instrumento import Instrumento
 
@@ -48,7 +48,58 @@ leituras = df.copy(deep=True)
 
 timer_load.get_delta_time_from_time_marker()
 
+setups_series_niveis_notaveis = {
+    "Nível de Atenção": dict(
+        label = "Nível de Atenção",
+        color = "#ffbb00",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+    "Nível de Alerta": dict(
+        label = "Nível de Alerta",
+        color = "orange",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+    "Nível de Emergência": dict(
+        label = "Nível de Emergência",
+        color = "red",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+    "Cota do Topo": dict(
+        label = "Cota do Topo",
+        color = "gray",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+    "Cota da Base": dict(
+        label = "Cota da Base",
+        color = "gray",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+    "Cota do Fundo": dict(
+        label = "Cota do Fundo",
+        color = "gray",
+        type = "plot",
+        setup = dict(marker="",linestyle="--",linewidth=1.0,alpha=1.),
+        toSecundary=False,
+        showLegend=True,
+        ),
+}
 
+log.setLevel("CRITICAL")
 timer_load.set_time_marker()
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
@@ -56,12 +107,14 @@ listaInstrumentos = dict()
 # Carregando os gráficos que serão renderizados
 graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
+    # Inicialização das variáveis para cada gráfico
     temSeco = False
     temJorrante = False
+    hasSecundary = False
     listaLimitesDatas = []
     listaLimitesValores = []
     listaLimitesValoresSec = []
-    print(f"Construindo \"{grafico}\"")
+    log.info(f"Construindo \"{grafico}\"")
     # Carregando as séries aliadas àquele gráfico
     filterGrafico = seriesSetting["Nome do gráfico"]==grafico
     seriesToPlot:pd.DataFrame = seriesSetting[filterGrafico]
@@ -103,6 +156,12 @@ for grafico in graphSetting["Nome do gráfico"]:
         # Resetar a leitura para cada instrumento [VARIPAVEL leituras NÃO É USADA APÓS ESSA LINHA]
         df_filtered = leituras.copy(deep=True)
         
+        # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
+        if not pd.isna(outlier_max):
+            df_filtered = df_filtered[df_filtered["Valor"]<outlier_max]
+        if not pd.isna(outlier_max):
+            df_filtered = df_filtered[df_filtered["Valor"]<outlier_max]
+        
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
         # instrumento_obj = Instrumento(cadastro_instrumento.to_dict())
@@ -112,9 +171,13 @@ for grafico in graphSetting["Nome do gráfico"]:
             print(cadastro_instrumento.values)
             print(f"{instrumento}: {m}")
             continue
-        instrumento_obj.set_leituras(leituras[leituras["Código do Instrumento"]==instrumento_obj.codigo])
+        instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
         
+        # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
+        if toSecundary:
+            hasSecundary = True
+            
         # Adicionando a série de leituras
         serie = Serie(
             X = instrumento_obj.leituras_validas["Data/Hora"],
@@ -138,7 +201,7 @@ for grafico in graphSetting["Nome do gráfico"]:
                 label=label,
                 color=color,
                 toSecundary=toSecundary,
-                showLegend=showLegend,
+                showLegend=False,
                 setup=dict(marker="x",linestyle="")
                 )
             list_series.append(serie)
@@ -153,25 +216,80 @@ for grafico in graphSetting["Nome do gráfico"]:
                 label=label,
                 color=color,
                 toSecundary=toSecundary,
-                showLegend=showLegend,
+                showLegend=False,
                 setup=dict(marker="s",linestyle="")
                 )
             list_series.append(serie)
+        
+        # Adicionando níveis notáveis conforme configuração na tabela
+        
+        # COMENTADO POR SER UMA OPÇÃO PIOR: Níveis notáveis estão apenas sobre o período de leitura
+        # datas = pd.DataFrame([instrumento_obj.data_minima,instrumento_obj.data_maxima])
+        
+        # Níveis notáveis estão sobre todo o gráfico, considerando as leituras entre 01/01/1000 e 01/01/3000
+        datas = pd.DataFrame([pd.Timestamp(day=1,month=1,year=1000),pd.Timestamp(day=1,month=1,year=3000)])
+        if temAtencao:
+            valor = instrumento_obj.atencao
+            if valor:
+                log.debug(f"{instrumento_obj.codigo} - Atenção {valor}")
+                listaLimitesValores.append(valor)
+                valores = pd.DataFrame([valor,valor])
+                kwargs = setups_series_niveis_notaveis["Nível de Atenção"]
+                list_series.append(Serie(datas,valores,**kwargs))
+        if temAlerta:
+            valor = instrumento_obj.alerta
+            if valor:
+                log.debug(f"{instrumento_obj.codigo} - Alerta {valor}")
+                listaLimitesValores.append(valor)
+                valores = pd.DataFrame([valor,valor])
+                kwargs = setups_series_niveis_notaveis["Nível de Alerta"]
+                list_series.append(Serie(datas,valores,**kwargs))
+        if temEmerg:
+            valor = instrumento_obj.emergencia
+            if valor:
+                log.debug(f"{instrumento_obj.codigo} - Emergência {valor}")
+                listaLimitesValores.append(valor)
+                valores = pd.DataFrame([valor,valor])
+                kwargs = setups_series_niveis_notaveis["Nível de Emergência"]
+                list_series.append(Serie(datas,valores,**kwargs))
+        if temFundo_Base:
+            valor = instrumento_obj.fundo_ou_base
+            if valor:
+                listaLimitesValores.append(valor)
+                valores = pd.DataFrame([valor,valor])
+                if instrumento_obj.label_cota_inferior == "fundo":
+                    log.debug(f"{instrumento_obj.codigo} - Fundo {valor}")
+                    kwargs = setups_series_niveis_notaveis["Cota do Fundo"]
+                    list_series.append(Serie(datas,valores,**kwargs))
+                if instrumento_obj.label_cota_inferior == "base":
+                    log.debug(f"{instrumento_obj.codigo} - Base {valor}")
+                    kwargs = setups_series_niveis_notaveis["Cota da Base"]
+                    list_series.append(Serie(datas,valores,**kwargs))
+        if temTopo:
+            valor = instrumento_obj.topo
+            if valor:
+                log.debug(f"{instrumento_obj.codigo} - Topo {valor}")
+                listaLimitesValores.append(valor)
+                valores = pd.DataFrame([valor,valor])
+                kwargs = setups_series_niveis_notaveis["Cota do Topo"]
+                list_series.append(Serie(datas,valores,**kwargs))
+        
+        # Adição os valores das datas máximas e mínimas dos instrumentos sem ser a pluviometria na lista de limites de datas
         if instrumento!="AGLPL001":
             listaLimitesDatas.append(instrumento_obj.data_hora_minima)
             listaLimitesDatas.append(instrumento_obj.data_hora_maxima)
+        
+        # Adição os valores dos valores y do eixo secundário de todos os instrumentos
         if toSecundary:
             listaLimitesValoresSec.append(instrumento_obj.valor_maximo)
             listaLimitesValoresSec.append(instrumento_obj.valor_minimo)
+        
+        # Adição os valores dos valores y do eixo principal de todos os instrumentos
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
-            
-        # Adicionando níveis conforme configuração na tabela
-        dataData = pd.DataFrame([instrumento_obj.data_minima,instrumento_obj.data_maxima])
-        if temAtencao:
-            list_series.append(Serie(dataData,pd.DataFrame([instrumento_obj.atencao]),label="Nível de Atenção",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
-
+    
+    # Importando entradas dos gráficos
     df_graph:pd.DataFrame = graphSetting[graphSetting["Nome do gráfico"]==grafico]
     title = df_graph["Nome do gráfico"].values[0]
     xInicial = df_graph["Data Inicial"].values[0]
@@ -184,39 +302,51 @@ for grafico in graphSetting["Nome do gráfico"]:
     nMonthLocator = df_graph["Distância em Meses dos Tickers"].values[0]
     hasSecos = df_graph["Tem Seco"].values[0] #################################### OBSOLETO ############################## <<<-------
     
-    if len(listaLimitesDatas)!=0:
+    # Adicionando os valores de maior prioridade nas tuplas de limites dos gráficos, caso há valores nas variáveis de limites
+    if len(listaLimitesDatas)!=0 and len(listaLimitesValores)!=0 and len(listaLimitesValoresSec)!=0:
+        intervaloData = intervaloPerfeitoDataMes(listaLimitesDatas,dV=nMonthLocator)
+        intervaloValor, dVy = intervaloPerfeito(listaLimitesValores)
+        intervaloValorSec, dVy2 = intervaloPerfeito(listaLimitesValoresSec)
         xlim = (
-            retornarValorNaoNulo(xInicial,min(intervaloPerfeitoData(listaLimitesDatas))),
-            retornarValorNaoNulo(xFinal,max(intervaloPerfeitoData(listaLimitesDatas)))
+            retornarValorNaoNulo(xInicial,min(intervaloData)),
+            retornarValorNaoNulo(xFinal,max(intervaloData))
             )
         ylim = (
-            retornarValorNaoNulo(yInicial,min(intervaloPerfeito(listaLimitesValores))),
-            retornarValorNaoNulo(yFinal,max(intervaloPerfeito(listaLimitesValores)))
+            retornarValorNaoNulo(yInicial,min(intervaloValor)),
+            retornarValorNaoNulo(yFinal,max(intervaloValor))
             )
         y2lim = (
-            retornarValorNaoNulo(y2Inicial,min(intervaloPerfeito(listaLimitesValoresSec))),
-            retornarValorNaoNulo(y2Final,max(intervaloPerfeito(listaLimitesValoresSec)))
+            retornarValorNaoNulo(y2Inicial,min(intervaloValorSec)),
+            retornarValorNaoNulo(y2Final,max(intervaloValorSec))
             )
     else:
         xlim = (None,None)
         ylim = (None,None)
         y2lim = (None,None)
+    
+    # Verificando PERÍODOS PEQUENOS (<~15 MESES) para definir nMonthLocator
     periodo:pd.Timedelta = max(xlim) - min(xlim)
-    periodo_meses = periodo.days//30>11
+    periodo_meses = periodo.days//30
     if periodo_meses<15:
         nMonthLocator = 3
         log.warning(f"Gráfico {grafico} tem um período de ~{periodo_meses} mês(es), por isso o intervalo dos ticks foi atualizado para {nMonthLocator} meses.")
-    xMajorLocator = MonthLocator(interval=int(nMonthLocator))
-    if nMonthLocator==6:
-        xMajorLocator = MonthLocator(bymonth=(1,7))
+    
+    # transformando o nMonthLocator em intervalos constantes dentro dos anos com a função monthByInterval
+    monthLocatorValor = monthByInterval(nMonthLocator)
+    if monthLocatorValor[0]:
+        xMajorLocator = MonthLocator(bymonth=monthLocatorValor[1])
+    else:
+        xMajorLocator = MonthLocator(interval=monthLocatorValor[2])
 
-    hasSecundary = True # Considerando que todos os gráficos de níveis tem pluviometria, está sendo posto em Hardcode esse parâmetro
 
+    # Colocando as variáveis construídas no loop no setup do gráfico
     setup_grafico = dict(
         xlim=xlim,
         ylim=ylim,
         y2lim=y2lim,
         yLabel=tituloYPrinc,
+        yMajorLocator = MultipleLocator(dVy),
+        y2MajorLocator = MultipleLocator(dVy2),
         # legendNcols = 6,
         xMajorLocator = xMajorLocator,
         xLabelFontsize = 10,
@@ -226,32 +356,15 @@ for grafico in graphSetting["Nome do gráfico"]:
         linewidth=2.0
         )
     
-    
+    # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
     
+    # Construindo o gráfico, renderizando e salvando
     graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
     graph.render(toFilter=False)
     graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
 
 timer_load.get_delta_time_from_time_marker()
-
-
-# log.setLevel("CRITICAL")
-# timer_load.set_time_marker()
-# listaInstrumentos = dict()
-# for i in range(len(cadastro)):
-#     print(cadastro.iloc[i].to_dict())
-#     instrumento = Instrumento(cadastro.iloc[i].to_dict())
-#     instrumento.set_leituras(leituras[leituras["Código do Instrumento"]==instrumento.codigo])
-#     listaInstrumentos[instrumento.codigo] = instrumento
-#     break
-# timer_load.get_delta_time_from_time_marker()
-
-# listaInstrumentos = dict()
-# print(cadastro.loc[cadastro["Código"]=="AGLEDVCPZ015_A"].to_dict())
-# instrumento = Instrumento(cadastro.iloc[i].to_dict())
-# instrumento.set_leituras(leituras[leituras["Código do Instrumento"]==instrumento.codigo])
-# listaInstrumentos[instrumento.codigo] = instrumento
