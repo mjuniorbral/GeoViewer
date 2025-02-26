@@ -173,6 +173,7 @@ class Instrumento():
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ACIMA DA COTA DE TOPO:\n{self.leituras_acima_topo[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NÃO REALIZADAS:\n{self.leituras_nao_realizada[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
+        relatorio += f"""LEITURAS NULAS:\n{self.leituras_nulas[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio+="---------------\n"
         if file_path:
             with open(file=file_path,mode="a") as file:
