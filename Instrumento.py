@@ -101,7 +101,6 @@ class Instrumento():
         df_mod = df_mod[df_mod["Situação da Medição"]=="Realizada"]
         df_mod = df_mod[isna(df_mod["Outlier"])]
         self.leituras_nulas = df_mod[isna(df_mod["Valor"])]
-        df_mod = df_mod[~isna(df_mod["Valor"])]
         
         valores_secos_jorrantes = Series(df_mod[~isna(df_mod["Condição Adversa"])]["Valor"])
         if not (len(valores_secos_jorrantes)==0): # Há leituras secas e jorrantes
@@ -111,6 +110,8 @@ class Instrumento():
             df_mod.loc[df_mod["Condição Adversa"]=="SECO"]["Valor"] = self.fundo_ou_base
             df_mod.loc[df_mod["Condição Adversa"]=="JORRANTE"]["Valor"] = self.topo
 
+        # Excluindo leituras sem valor depois do filtro de Outliers, Leituras Realizadas e Preenchimento dos SECOS e JORRANTES
+        df_mod = df_mod[~isna(df_mod["Valor"])]
         self.leituras_secas = df_mod[df_mod["Condição Adversa"]=="SECO"]
         self.leituras_jorrantes = df_mod[df_mod["Condição Adversa"]=="JORRANTE"]
         self.leituras_nao_secas = df_mod[isna(df_mod["Condição Adversa"])]
