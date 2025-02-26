@@ -313,33 +313,49 @@ for grafico in graphSetting["Nome do gráfico"]:
     hasSecos = df_graph["Tem Seco"].values[0] #################################### OBSOLETO ############################## <<<-------
     
     # Adicionando os valores de maior prioridade nas tuplas de limites dos gráficos, caso há valores nas variáveis de limites
-    if len(listaLimitesDatas)!=0 and len(listaLimitesValores)!=0 and len(listaLimitesValoresSec)!=0:
+    if len(listaLimitesDatas)!=0:
         intervaloData = intervaloPerfeitoDataMes(listaLimitesDatas,dV=nMonthLocator)
-        intervaloValor, dVy = intervaloPerfeito(listaLimitesValores)
-        intervaloValorSec, dVy2 = intervaloPerfeito(listaLimitesValoresSec)
         xlim = (
-            retornarValorNaoNulo(xInicial,min(intervaloData)),
-            retornarValorNaoNulo(xFinal,max(intervaloData))
-            )
-        ylim = (
-            retornarValorNaoNulo(yInicial,min(intervaloValor)),
-            retornarValorNaoNulo(yFinal,max(intervaloValor))
-            )
-        y2lim = (
-            retornarValorNaoNulo(y2Inicial,min(intervaloValorSec)),
-            retornarValorNaoNulo(y2Final,max(intervaloValorSec))
+            retornarValorNaoNulo(xInicial,minimoValido(intervaloData)),
+            retornarValorNaoNulo(xFinal,maximoValido(intervaloData))
             )
     else:
         xlim = (None,None)
+        
+    if len(listaLimitesValores)!=0:
+        intervaloValor, dVy = intervaloPerfeito(listaLimitesValores)
+        ylim = (
+            retornarValorNaoNulo(yInicial,minimoValido(intervaloValor)),
+            retornarValorNaoNulo(yFinal,maximoValido(intervaloValor))
+            )
+    else:
         ylim = (None,None)
+        
+    if len(listaLimitesValoresSec)!=0:
+        intervaloValorSec, dVy2 = intervaloPerfeito(listaLimitesValoresSec)
+        y2lim = (
+            retornarValorNaoNulo(y2Inicial,minimoValido(intervaloValorSec)),
+            retornarValorNaoNulo(y2Final,maximoValido(intervaloValorSec))
+            )
+    else:
         y2lim = (None,None)
+        # log.warning(f"O gráfico {grafico} não será renderizado por não haver leituras nele.")
+        # continue
     
-    # Verificando PERÍODOS PEQUENOS (<~15 MESES) para definir nMonthLocator
-    periodo:pd.Timedelta = max(xlim) - min(xlim)
-    periodo_meses = periodo.days//30
-    if periodo_meses<15:
-        nMonthLocator = 3
-        log.warning(f"Gráfico {grafico} tem um período de ~{periodo_meses} mês(es), por isso o intervalo dos ticks foi atualizado para {nMonthLocator} meses.")
+    if xlim != (None,None):
+        # Verificando PERÍODOS PEQUENOS (<~15 MESES) para definir nMonthLocator
+        periodo:pd.Timedelta = pd.Timedelta(maximoValido(xlim) - minimoValido(xlim))
+        periodo_meses = periodo.days//30
+        if periodo_meses<15:
+            nMonthLocator = 3
+            log.warning(f"Gráfico {grafico} tem um período de ~{periodo_meses} mês(es), por isso o intervalo dos ticks foi atualizado para {nMonthLocator} meses.")
+    else:
+        if len(list_series)<=1:
+            if list_series[0].label=="AGLPL001":
+                print("\n"*4)
+                log.warning(f"\n\nO único instrumento que tem nesse gráfico é a pluviometria no eixo secundário {list_series[0].label}.\nEsse gráfico não pode ser gerado com a versão atual do programa. Contatar desenvolvedor do programa.\nAperte ENTER para confirmar a ciência dessa informação")
+                input_str = input("\n")
+                continue
     
     # transformando o nMonthLocator em intervalos constantes dentro dos anos com a função monthByInterval
     monthLocatorValor = monthByInterval(nMonthLocator)
@@ -355,8 +371,6 @@ for grafico in graphSetting["Nome do gráfico"]:
         ylim=ylim,
         y2lim=y2lim,
         yLabel=tituloYPrinc,
-        yMajorLocator = MultipleLocator(dVy),
-        y2MajorLocator = MultipleLocator(dVy2),
         # legendNcols = 6,
         xMajorLocator = xMajorLocator,
         xLabelFontsize = 10,
@@ -365,6 +379,13 @@ for grafico in graphSetting["Nome do gráfico"]:
         labelMajorSize = 12,
         linewidth=2.0
         )
+    if ylim!=(None,None) and y2lim!=(None,None):
+        setup_grafico.update(
+            dict(
+                yMajorLocator = MultipleLocator(dVy),
+                y2MajorLocator = MultipleLocator(dVy2)
+                )
+            )
     
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
