@@ -237,3 +237,21 @@ for grafico in graphSetting["Nome do gráfico"]:
     graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
 
 timer_load.get_delta_time_from_time_marker()
+
+
+# log.setLevel("CRITICAL")
+# timer_load.set_time_marker()
+# listaInstrumentos = dict()
+# for i in range(len(cadastro)):
+#     print(cadastro.iloc[i].to_dict())
+#     instrumento = Instrumento(cadastro.iloc[i].to_dict())
+#     instrumento.set_leituras(leituras[leituras["Código do Instrumento"]==instrumento.codigo])
+#     listaInstrumentos[instrumento.codigo] = instrumento
+#     break
+# timer_load.get_delta_time_from_time_marker()
+
+# listaInstrumentos = dict()
+# print(cadastro.loc[cadastro["Código"]=="AGLEDVCPZ015_A"].to_dict())
+# instrumento = Instrumento(cadastro.iloc[i].to_dict())
+# instrumento.set_leituras(leituras[leituras["Código do Instrumento"]==instrumento.codigo])
+# listaInstrumentos[instrumento.codigo] = instrumento
