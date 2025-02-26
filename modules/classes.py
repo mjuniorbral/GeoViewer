@@ -221,9 +221,9 @@ class Graphic():
             labelMinorSize = 10,
             labelMajorColor = "black",
             labelMinorColor = "black",
-            legendFonteSize = 12,
-            legendLoc="best",
-            legendBbox_to_anchor=(0,0,1,1),
+            legendFonteSize = 10,
+            legendLoc='upper center',
+            legendBbox_to_anchor = (0.5,-0.25),
             legendNcols=5,
             labelTitleFontsize = 16
         )
