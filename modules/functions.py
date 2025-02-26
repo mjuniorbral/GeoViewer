@@ -102,7 +102,36 @@ def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max
     else:
         raise Exception("Ainda não foi implementado o superior=False")
 
-def intervaloPerfeitoData(datas,dV=None,superior=True,min_=None,max_=None):
+def monthByInterval(n):
+    if 12%n!=0:
+        return (False,(),n)
+    tupla = ()
+    cont = 1
+    while cont<13:
+        tupla+=(cont,)
+        cont+=n
+    return (True,tupla,n)
+
+def intervaloPerfeitoDataMes(datas:list[pd.Timestamp],dV:int|None=None,superior=True,min_=None,max_=None):
+    datas = tuple(dropNone(datas))
+    data_min = min(datas)
+    data_max = max(datas)
+    minCorrigido = pd.Timestamp(day=1,month=data_min.month,year=data_min.year)
+    maxCorrigido = data_max+pd.Timedelta(days=32)
+    maxCorrigido = pd.Timestamp(day=1,month=maxCorrigido.month,year=maxCorrigido.year)
+    if dV==None:
+        return (minCorrigido,maxCorrigido)
+    elif isinstance(dV,int):
+        monthByIntervalValor = monthByInterval(dV)
+        if monthByIntervalValor[0]:
+            min_month = minCorrigido.month
+            while not(min_month in monthByIntervalValor[1]):
+                min_month-=1
+            minCorrigido = pd.Timestamp(day=1, month=min_month, year=minCorrigido.year)
+        else:
+            return (minCorrigido,maxCorrigido)
+    
+def intervaloPerfeitoData(datas:list[pd.Timestamp],dV:int|None=None,superior=True,min_=None,max_=None):
     datas = tuple(dropNone(datas))
     if len(datas)==0:
         return (None,None)
@@ -371,12 +400,3 @@ def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
     else:
         return valorAVerifica
     
-def monthByInterval(n):
-    if 12%n!=0:
-        return (False,(),n)
-    tupla = ()
-    cont = 1
-    while cont<13:
-        tupla+=(cont,)
-        cont+=n
-    return (True,tupla,n)
