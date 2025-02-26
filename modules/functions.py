@@ -247,14 +247,14 @@ def pullValues(dict:dict,keys:list):
             dictToReturn.update({key:value})
     return dictToReturn
         
-def getWindowsArtist(artist:Artist,fig:Figure,log.debug_=False):
+def getWindowsArtist(artist:Artist,fig:Figure,print_=False):
     # Obtendo a posição e o tamanho do artist
     bbox = artist.get_window_extent()
     
     # Convertendo as coordenadas de janela para coordenadas da figura
     bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
 
-    if log.debug_:
+    if print_:
         # Imprimindo a posição e o tamanho
         log.debug(f'Posição (x0, y0): ({bbox.x0}, {bbox.y0})')
         log.debug(f'Tamanho (largura, altura): ({bbox.width}, {bbox.height})')
