@@ -71,7 +71,7 @@ def isEvery(iterable,type_):
             return False
     return True
 
-def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max_=None,returndV=False):
+def intervaloPerfeito_old(valores,dV:float|int|None=None,superior=True,min_=None,max_=None,returndV=False):
     valores = tuple(dropNone(valores))
     if len(valores)==0:
         return (None,None)
@@ -102,6 +102,72 @@ def intervaloPerfeito(valores,dV:float|int|None=None,superior=True,min_=None,max
     else:
         raise Exception("Ainda não foi implementado o superior=False")
 
+def retornaIndexProx(alvo,lista,inferior=True):
+    lista = sorted(lista)
+    for i in range(len(lista)):
+        if lista[i]>=alvo:
+            break
+    if inferior:
+        return i
+    else:
+        return i+1
+
+def intervaloPerfeito_old2(valores,
+                      nDiv=5,
+                      dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100)):
+    """Substitui a função intervaloPerfeito_old anterior"""
+    valores = tuple(dropNone(valores))
+    print(valores) #############################################################
+    if len(valores)==0:
+        return (None,None)
+    min_ = min(valores)
+    max_ = max(valores)
+    print(min_,max_) #############################################################
+    L = float(abs(max_-min_))
+    print(L) #############################################################
+    dVDefault = sorted(dVDefault)
+    dV = dVDefault[retornaIndexProx(L/nDiv,dVDefault)]
+    print(dV) #############################################################
+    correcao = 1
+    if min_%dV==0:
+        correcao = 0
+    minPerf = ((min_//dV)-correcao)*dV
+    correcao = 1
+    if max_%dV==0:
+        correcao = 0
+    maxPerf = ((max_//dV)+correcao)*dV
+    return (minPerf, maxPerf), dV
+
+def intervaloPerfeito(valores,
+                      nDiv=5,
+                      dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100)):
+    """Substitui a função intervaloPerfeito_old2 anterior"""
+    valores = tuple(dropNone(valores))
+    print(valores) #############################################################
+    if len(valores)==0:
+        return (None,None)
+    min_ = min(valores)
+    max_ = max(valores)
+    print(min_,max_) #############################################################
+    L = float(abs(max_-min_))
+    print(L) #############################################################
+    dVDefault = sorted(dVDefault,reverse=True)
+    for dVi in dVDefault:
+        print(f"{L}/{dVi}={L/dVi}")
+        if L/dVi>nDiv:
+            dV=dVi
+            break
+    print(dV) #############################################################
+    correcao = 1
+    if min_%dV==0:
+        correcao = 0
+    minPerf = ((min_//dV)-correcao)*dV
+    correcao = 1
+    if max_%dV==0:
+        correcao = 0
+    maxPerf = ((max_//dV)+correcao)*dV
+    return (minPerf, maxPerf), dV
+
 def monthByInterval(n):
     if 12%n!=0:
         return (False,(),n)
@@ -114,6 +180,8 @@ def monthByInterval(n):
 
 def intervaloPerfeitoDataMes(datas:list[pd.Timestamp],dV:int|None=None,superior=True,min_=None,max_=None):
     datas = tuple(dropNone(datas))
+    if len(datas)==0:
+        return (None,None)
     data_min = min(datas)
     data_max = max(datas)
     minCorrigido = pd.Timestamp(day=1,month=data_min.month,year=data_min.year)
@@ -121,15 +189,17 @@ def intervaloPerfeitoDataMes(datas:list[pd.Timestamp],dV:int|None=None,superior=
     maxCorrigido = pd.Timestamp(day=1,month=maxCorrigido.month,year=maxCorrigido.year)
     if dV==None:
         return (minCorrigido,maxCorrigido)
-    elif isinstance(dV,int):
-        monthByIntervalValor = monthByInterval(dV)
-        if monthByIntervalValor[0]:
-            min_month = minCorrigido.month
-            while not(min_month in monthByIntervalValor[1]):
-                min_month-=1
-            minCorrigido = pd.Timestamp(day=1, month=min_month, year=minCorrigido.year)
-        else:
-            return (minCorrigido,maxCorrigido)
+    
+    dV = int(dV)
+    monthByIntervalValor = monthByInterval(dV)
+    if monthByIntervalValor[0]:
+        min_month = minCorrigido.month
+        while not(min_month in monthByIntervalValor[1]):
+            min_month-=1
+        minCorrigido = pd.Timestamp(day=1, month=min_month, year=minCorrigido.year)
+        return (minCorrigido,maxCorrigido)
+    else:
+        return (minCorrigido,maxCorrigido)
     
 def intervaloPerfeitoData(datas:list[pd.Timestamp],dV:int|None=None,superior=True,min_=None,max_=None):
     datas = tuple(dropNone(datas))
@@ -385,10 +455,12 @@ def somar_data_e_hora(data:pd.Series,hora:pd.Series):
         for i in data.index:
             if pd.isnull(data[i]):
                 raise Exception(f"[###] Data {data[i]} é não válido")
-            if pd.isnull(hora[i]):
+            elif pd.isnull(hora[i]):
                 retorno.append(data[i])
-    raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
-    return retorno
+            else:
+                retorno.append(data[i]+hora[i])
+    # raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
+    return pd.Series(retorno)
 
 def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
     if pd.isnull(valorAVerifica):
