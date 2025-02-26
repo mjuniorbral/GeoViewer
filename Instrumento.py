@@ -27,6 +27,10 @@ class Instrumento():
         self.local = reduzir_a_um([dict_cadastro['Local Instalação']])
         self.condicao = reduzir_a_um([dict_cadastro['Condicao de Instrumento']])
         self.fundo_ou_base = reduzir_a_um([dict_cadastro['Cota do Fundo (m)'], dict_cadastro['Cota da Base (m)']])
+        if isna(dict_cadastro['Cota da Base (m)']):
+            self.label_cota_inferior = "fundo"
+        else:
+            self.label_cota_inferior = "base"
         self.topo = reduzir_a_um([dict_cadastro['Cota do Topo (m)']])
         self.angulo = reduzir_a_um([dict_cadastro['Ângulo de Instalação (°)']])
         self.prof = reduzir_a_um([dict_cadastro['Profundidade (m)']])
