@@ -7,7 +7,17 @@ log.info("Iniciando carregamento de dados...")
 
 import pandas as pd
 from modules.classes import *
-from modules import readSheets,tratarDados,columnData,Serie,Graphic,retornarValorNaoNulo,monthByInterval,intervaloPerfeitoDataMes
+from modules import (
+    readSheets,
+    tratarDados,
+    columnData,
+    Serie,Graphic,
+    retornarValorNaoNulo,
+    monthByInterval,
+    intervaloPerfeitoDataMes,
+    minimoValido,
+    maximoValido
+    )
 from modules.agCadastro import UnirCadastroGEOTEC
 from Instrumento import Instrumento
 
