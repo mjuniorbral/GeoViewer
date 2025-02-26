@@ -1,6 +1,6 @@
 from modules import Timer
 from modules import log
-log.setLevel("ERROR")
+log.setLevel("INFO")
 timer_load = Timer()
 timer_load.set_time_marker()
 log.info("Iniciando carregamento de dados...")
@@ -37,7 +37,7 @@ DFT_PARSE_DATES = [
 
 PATH_LEITURAS = "data\Historico\Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = "data\Historico\\2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = "data\Historico\Config-Graficos_EDMJ-Historico-Individual.xlsx"
+PATH_CONFIG = "data\Historico\CONFIG\Config-Graficos_EDMJ-Historico-Individual.xlsx"
 
 log.info("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
@@ -301,6 +301,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
+        log.info(f"\"{instrumento_obj.codigo}\" finalizado. =============================")
     
     # Importando entradas dos gráficos
     df_graph:pd.DataFrame = graphSetting[graphSetting["Nome do gráfico"]==grafico]
