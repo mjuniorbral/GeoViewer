@@ -112,19 +112,22 @@ def intervaloPerfeito(valores,
     for dVi in dVDefault:
         log.debug(f"{L}/{dVi}={L/dVi}")
         if L/dVi>nDiv:
-            dV=dVi
+            dV_=dVi
             break
-    log.debug(dV) #############################################################
+    else:
+        log.critical(f"\n\n\nLOOP FOR foi iterado completamente e não achou a divisão igual a nDiv\n{L=} / {max_=} / {min_=} / {valores=}\n\n\n")
+        dV_ = min(dVDefault)
+    log.debug(dV_) #############################################################
     correcao = 1
-    if min_%dV==0:
+    if min_%dV_==0:
         correcao = 0
-    minPerf = ((min_//dV)-correcao)*dV
+    minPerf = ((min_//dV_)-correcao)*dV_
     correcao = 1
-    if max_%dV==0:
+    if max_%dV_==0:
         correcao = 0
-    maxPerf = ((max_//dV)+correcao)*dV
-    log.debug((minPerf, maxPerf), dV)
-    return (minPerf, maxPerf), dV
+    maxPerf = ((max_//dV_)+correcao)*dV_
+    log.debug((minPerf, maxPerf), dV_)
+    return (minPerf, maxPerf), dV_
 
 def monthByInterval(n):
     if 12%n!=0:
