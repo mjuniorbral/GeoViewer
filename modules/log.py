@@ -2,7 +2,7 @@ import logging
 from logging import Formatter, StreamHandler, getLogger, DEBUG
 
 # 1. Formatter
-formatter = Formatter("[%(asctime)s] %(levelname)s : %(filename)s.%(funcName)s: [line %(lineno)d]: %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
+formatter = Formatter("[%(asctime)s] %(levelname)s : %(pathname)s#%(lineno)d [%(funcName)s]: %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
 # 2. Handler
 handler = StreamHandler()
