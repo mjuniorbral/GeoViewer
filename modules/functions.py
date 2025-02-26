@@ -204,6 +204,8 @@ def monthByInterval(n):
 
 def intervaloPerfeitoDataMes(datas:list[pd.Timestamp],dV:int|None=None,superior=True,min_=None,max_=None):
     datas = tuple(dropNone(datas))
+    if not isEvery(datas,pd.Timestamp):
+        raise Exception("Nem todos os elementos da variável data é pd.Timestamp")
     if len(datas)==0:
         return (None,None)
     data_min = min(datas)
