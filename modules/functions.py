@@ -3,7 +3,10 @@ import os
 from matplotlib.figure import Figure
 from matplotlib.artist import Artist
 from datetime import datetime,time
-from log import log
+if __name__ == "__main__":
+    from log import log
+else:
+    from .log import log
 
 # Comando para ignorar os UserWarning dados pelo Pyhton
 import warnings
