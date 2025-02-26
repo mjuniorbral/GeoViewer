@@ -211,9 +211,9 @@ def intervaloPerfeitoDataMes(datas:list[pd.Timestamp],dV:int|None=None,superior=
         return (None,None)
     data_min = min(datas)
     data_max = max(datas)
-    minCorrigido = pd.Timestamp(day=1,month=data_min.month,year=data_min.year)
+    minCorrigido = pd.Timestamp(day=1,month=int(data_min.month),year=int(data_min.year))
     maxCorrigido = data_max+pd.Timedelta(days=32)
-    maxCorrigido = pd.Timestamp(day=1,month=maxCorrigido.month,year=maxCorrigido.year)
+    maxCorrigido = pd.Timestamp(day=1,month=int(maxCorrigido.month),year=int(maxCorrigido.year))
     if dV==None:
         return (minCorrigido,maxCorrigido)
     
