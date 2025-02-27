@@ -660,7 +660,7 @@ class Instrumento():
         relatorio += f"""LEITURAS NEGATIVAS:\n{self.leituras_negativas[["Data de Medição","Hora da Medição","Valor","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio+="---------------\n"
         if file_path:
-            with open(file=file_path,mode="a") as file:
+            with open(file=file_path,mode="w") as file:
                 file.write(relatorio)
                 log.info(f"Salvando relatório do instrumento {self.codigo} no caminho {file_path}")
         return relatorio
