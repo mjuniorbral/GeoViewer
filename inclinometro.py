@@ -1,6 +1,9 @@
-import time
-start_time = time.time()
-print("Programa iniciado")
+from modules import log, Timer
+log.setLevel("INFO")
+timer_ = Timer()
+timer_.set_time_marker("carregamento e renderização")
+
+log.info("Programa iniciado")
 
 import datetime
 import pandas as pd
@@ -220,7 +223,7 @@ for inc in lista_inc:
         alpha = 1
         nPlanilha = len(planilhas.keys())
         for nomePlanilha in planilhas.keys():
-            # print(f"Lendo '{nomePlanilha}' do '{baseFile}'")
+            log.info(f"Lendo '{nomePlanilha}' do '{baseFile}'")
             df = planilhas[nomePlanilha].copy(deep=True)
             cabecalho = df.iloc[0:id_header]
             df.columns = df.iloc[id_header]
@@ -231,7 +234,7 @@ for inc in lista_inc:
             if not isinstance(nomeSerie,str):
                 nomeSerie = cabecalho.iloc[6,1].strftime("%d/%m/%Y")
             if (str(nomeSerie) in blacklist) or ("desconsiderar" in nomePlanilha.lower()):
-                # print(f"Planilha '{nomePlanilha}' desconsiderada.")
+                log.warning(f"Planilha '{nomePlanilha}' desconsiderada.")
                 continue
             serie = Serie(X,Y,label=nomeSerie,
                           setup=dict(markersize=2,marker="o",linewidth=1.2,alpha=alpha),
@@ -244,7 +247,7 @@ for inc in lista_inc:
         xmax = +dataTree["axisX"][axisX]["xmax"]
         graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(xmin,xmax)))
         graph.render(False)
-        # print(min(graph.xValores),max(graph.xValores))
+        log.debug(f"{min(graph.xValores)},{max(graph.xValores)}")
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png",showLog=True)
-end_time = time.time()
-print(f"Programa finalizado em {end_time-start_time:.5f} segs.\n")
+
+timer_.get_delta_time_from_time_marker("carregamento e renderização")
