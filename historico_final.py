@@ -36,10 +36,10 @@ DFT_PARSE_DATES = [
 DFT_DECIMAL = ","
 
 ################ ENTRADAS ################
-PATH_FOLDER = "data\Historico\Historico-Jan2025\\"
-PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
-PATH_CADASTRO = PATH_FOLDER+"2298_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico.xlsx"
+PATH_FOLDER = "data\\"
+PATH_LEITURAS = PATH_FOLDER+"Historico-até-26-FEV-2025.csv"
+PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
+PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico-Individual.xlsx"
 ##########################################
 
 log.info("Importando leituras")
