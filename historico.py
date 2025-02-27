@@ -192,7 +192,6 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
-        # instrumento_obj = Instrumento(cadastro_instrumento.to_dict())
         try:
             instrumento_obj = Instrumento(cadastro_instrumento.to_dict(orient="records")[0])
         except Exception as m:
@@ -203,8 +202,10 @@ for grafico in graphSetting["Nome do gráfico"]:
         if not instrumento_obj.possui_leituras:
             log.warning(f"Instrumento {instrumento_obj.codigo} não possui leitura, por isso não será renderizado.")
             continue
-        instrumento_obj.descrever(PATH_OUT+str(instrumento_obj.codigo)+".txt")
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
+
+        # Salvando relatório de descrição do instrumento no PATH_OUT
+        instrumento_obj.descrever(filepath=PATH_OUT+str(instrumento_obj.codigo)+".txt")
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
         if toSecundary:
