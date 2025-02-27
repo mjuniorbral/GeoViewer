@@ -634,8 +634,23 @@ class Instrumento():
     __repr__ = __str__
     
     def descrever(self,file_path:str=""):
-        relatorio = f"{self.tipo} {self.codigo} - {self.tipo_estrutura} {self.estrutura}\n\n"
         log.info(f"Gerando relatório do instrumento {self.codigo}")
+        relatorio = f"{self.codigo} - {self.tipo_estrutura} {self.estrutura}\n\n"
+        relatorio += f"{self.tipo=} {self.sub_tipo=}\n"
+        relatorio += f"{self.condicao=}\n"
+        relatorio += f"{self.descricao=}\n"
+        relatorio += f"{self.obs=}\n"
+        relatorio += f"{self.data_instalacao=}\n"        
+        relatorio += f"{self.sistema_coordenadas=} ({self.fuso=})\n"
+        relatorio += f"{self.coordenadas=}\n"
+        relatorio += f"{self.local=}\n"
+        relatorio += f"{self.topo=}\n"
+        relatorio += f"{self.base_celula=} ({self.label_cota_inferior})\n"
+        relatorio += f"{self.crista_barragem=} / {self.soleira_vertedor=}\n"
+        relatorio += f"{self.atencao=}\n"
+        relatorio += f"{self.alerta=}\n"
+        relatorio += f"{self.emergencia=}\n"
+        relatorio += f"{self.porcentagem_seco=}\n\n\n"
         relatorio += f"""LEITURAS OUTLIERS:\n{self.leituras_outliers[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""            
         relatorio += f"""LEITURAS ACIMA DE NÍVEL DE CONTROLE:\n{self.leituras_acima_nv_controle[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
