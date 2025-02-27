@@ -24,6 +24,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 DFT_DELIMITER = ";"
+DFT_DECIMAL = ","
 DFT_ENCONDING = "ISO-8859-1"
 # DFT_ENCONDING = "UTF-8" # Enconding para CSV (UTF-8)
 DFT_DTYPE = {
@@ -33,7 +34,6 @@ DFT_PARSE_DATES = [
     "Data de Medição",
     "Hora da Medição"
     ]
-DFT_DECIMAL = ","
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
