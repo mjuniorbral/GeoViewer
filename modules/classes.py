@@ -554,6 +554,8 @@ class Instrumento():
                     log.critical(self.codigo)
                     log.critical(df_mod.to_string())
                     raise Exception()
+        # Ordenando o dataframe conforme a DATA e HORA da medição
+        df_mod = df_mod.sort_values("Data/Hora")
         
         self.leituras_nao_realizada = df_mod[df_mod["Situação da Medição"]=="Não Realizada"]
         self.leituras_outliers = df_mod[df_mod["Outlier"]=="SIM"]
