@@ -2,7 +2,7 @@ from modules import Timer
 from modules import log
 log.setLevel("INFO")
 timer_load = Timer()
-timer_load.set_time_marker()
+timer_load.set_time_marker("carregamento")
 log.info("Iniciando carregamento de dados...\n\n")
 
 import pandas as pd
@@ -55,7 +55,7 @@ graphSetting = settings["Gráficos"]
 
 leituras = df.copy(deep=True)
 
-timer_load.get_delta_time_from_time_marker()
+timer_load.get_delta_time_from_time_marker("carregamento")
 log.info("Configurações importadas\n\n")
 
 setups_series_niveis_notaveis = {
@@ -109,7 +109,7 @@ setups_series_niveis_notaveis = {
         ),
 }
 
-timer_load.set_time_marker()
+timer_load.set_time_marker("renderização")
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
 
@@ -406,4 +406,4 @@ for grafico in graphSetting["Nome do gráfico"]:
     graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
     log.info(f"\"{grafico}\" finalizado.\n =============================\n\n")
 
-timer_load.get_delta_time_from_time_marker()
+timer_load.get_delta_time_from_time_marker("renderização")
