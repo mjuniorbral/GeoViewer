@@ -12,6 +12,7 @@ import warnings
 warnings.filterwarnings("ignore")
 from modules.functions import readSheets
 from modules.classes import *
+from modules import intervaloPerfeito
 import matplotlib.pyplot as plt
 
 # Variável abaixo indicam as datas das séries a SEREM OCULTADAS NOS GRÁFICOS
@@ -131,7 +132,7 @@ setup_inclinometro = dict(
     yLabel = "Profundidade (m)",
     xLabelFontsize = 12,
     xLabel = "Deslococamento (m)",
-    legendFonteSize = 11,
+    legendFonteSize = 10,
     legendNcols = 1, # Antes: 3 (atualizado em 04/11/2024) - Foi diminuido de 3 para 1 por causa do filtro de datas do gráfico, por isso não há necessidade de tantas colunas
     legendBbox_to_anchor = (1.05, 1),
     legendLoc='upper left',
@@ -245,7 +246,8 @@ for inc in lista_inc:
                         setup=setup_inclinometro)
         xmin = -dataTree["axisX"][axisX]["xmax"]
         xmax = +dataTree["axisX"][axisX]["xmax"]
-        graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=(xmin,xmax)))
+        xlim, dV_ = intervaloPerfeito([xmin,xmax],nDiv=4)
+        graph.update_setup(dict(xLabel=xLabel,yLabel=yLabel,ylim=(depth,0),xlim=xlim,xMajorLocator=MultipleLocator(dV_)))
         graph.render(False)
         log.debug(f"{min(graph.xValores)},{max(graph.xValores)}")
         graph.save(path=f"images/incGrafico/{inc}-{axisX}.png",showLog=True)
