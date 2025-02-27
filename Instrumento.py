@@ -107,8 +107,8 @@ class Instrumento():
             valores_secos_jorrantes = valores_secos_jorrantes.dropna()
             if len(valores_secos_jorrantes.to_list())>0:
                 raise Exception(f"Valores escritos em leituras secas/jorrantes no instrumento {self.codigo}:\n{isna(valores_secos_jorrantes[0])}")
-            df_mod.loc[df_mod["Condição Adversa"]=="SECO"]["Valor"] = self.fundo_ou_base
-            df_mod.loc[df_mod["Condição Adversa"]=="JORRANTE"]["Valor"] = self.topo
+            df_mod.loc[df_mod["Condição Adversa"]=="SECO", "Valor"] = self.fundo_ou_base
+            df_mod.loc[df_mod["Condição Adversa"]=="JORRANTE","Valor"] = self.topo
 
         # Excluindo leituras sem valor depois do filtro de Outliers, Leituras Realizadas e Preenchimento dos SECOS e JORRANTES
         df_mod = df_mod[~isna(df_mod["Valor"])]
