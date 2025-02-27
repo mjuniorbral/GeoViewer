@@ -3,7 +3,7 @@ from modules import log
 log.setLevel("INFO")
 timer_load = Timer()
 timer_load.set_time_marker()
-log.info("Iniciando carregamento de dados...")
+log.info("Iniciando carregamento de dados...\n\n")
 
 import pandas as pd
 from modules.classes import *
@@ -42,21 +42,21 @@ PATH_CONFIG = "data\Historico\Historico-Jan2025\Config-Graficos_DIO-Historico.xl
 log.info("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
 df["Hora da Medição"] = df["Hora da Medição"].dt.time
-log.info("Leituras importadas e tratadas")
+log.info("Leituras importadas e tratadas\n\n")
 
 log.info("Importando cadastros")
 cadastro = UnirCadastroGEOTEC(PATH_CADASTRO)
-log.info("Cadastros importados")
+log.info("Cadastros importados\n\n")
 
 log.info("Importando configurações")
 settings = readSheets(PATH_CONFIG,showLog=False)
 seriesSetting = settings["Séries"]
 graphSetting = settings["Gráficos"]
-log.info("Configurações importadas")
 
 leituras = df.copy(deep=True)
 
 timer_load.get_delta_time_from_time_marker()
+log.info("Configurações importadas\n\n")
 
 setups_series_niveis_notaveis = {
     "Nível de Atenção": dict(
@@ -113,6 +113,8 @@ timer_load.set_time_marker()
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
 
+log.info("Carregamento de dados finalizado.\n\n\n=============================")
+
 # Carregando os gráficos que serão renderizados
 graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
@@ -129,7 +131,7 @@ for grafico in graphSetting["Nome do gráfico"]:
     seriesToPlot:pd.DataFrame = seriesSetting[filterGrafico]
     list_series: list[Serie]= []
     for instrumento in seriesToPlot["Instrumentos"].values:
-        log.info(f"Definindo série de \"{instrumento}\" =============================")
+        log.info(f"Definindo série de \"{instrumento}\"")
         # Extraindo dados sobre o instrumento a ser renderizado nessa iteração
         df_instr:pd.DataFrame = seriesToPlot[seriesToPlot["Instrumentos"]==instrumento]
         
@@ -301,7 +303,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
-        log.info(f"\"{instrumento_obj.codigo}\" finalizado. =============================")
+        log.info(f"\"{instrumento_obj.codigo}\" finalizado.\n=============================")
     
     # Importando entradas dos gráficos
     df_graph:pd.DataFrame = graphSetting[graphSetting["Nome do gráfico"]==grafico]
@@ -402,6 +404,6 @@ for grafico in graphSetting["Nome do gráfico"]:
     graph.render(toFilter=False)
     log.debug(list_series)
     graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
-    log.info(f"\"{grafico}\" finalizado. =============================")
+    log.info(f"\"{grafico}\" finalizado.\n =============================\n\n")
 
 timer_load.get_delta_time_from_time_marker()
