@@ -25,7 +25,7 @@ warnings.filterwarnings("ignore")
 
 DFT_DELIMITER = ";"
 DFT_ENCONDING = "ISO-8859-1"
-DFT_ENCONDING = "UTF-8"
+# DFT_ENCONDING = "UTF-8" # Enconding para CSV (UTF-8)
 DFT_DTYPE = {
     "Valor": "float",
 }
@@ -37,9 +37,9 @@ DFT_DECIMAL = ","
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"Historico-até-26-FEV-2025.csv"
+PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico-Individual.xlsx"
+PATH_CONFIG = PATH_FOLDER+"Config-Graficos_MON-Historico-Individual.xlsx"
 ##########################################
 
 log.info("Importando leituras")
