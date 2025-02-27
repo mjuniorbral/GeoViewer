@@ -3,6 +3,7 @@ start_time = time.time()
 print("Iniciando carregamento de dados...")
 
 import pandas as pd
+from numpy import where
 from modules.classes import *
 from modules import readSheets,tratarDados,columnData,Serie,Graphic
 from modules.agCadastro import UnirCadastroGEOTEC
@@ -42,7 +43,7 @@ graphSetting = settings["Gráficos"]
 
 df_mod = df.merge(cadastro[["Código", "Cota do Fundo (m)"]],left_on="Código do Instrumento",right_on="Código",how="left")
 
-df_mod["Valor Final"] = np.where(df_mod["Condição Adversa"]=="SECO", df_mod["Cota do Fundo (m)"], df_mod["Valor"])
+df_mod["Valor Final"] = where(df_mod["Condição Adversa"]=="SECO", df_mod["Cota do Fundo (m)"], df_mod["Valor"])
 
 leituras = df_mod.copy(deep=True)
 
