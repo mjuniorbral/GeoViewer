@@ -19,7 +19,6 @@ from modules import (
     maximoValido
     )
 from modules.agCadastro import UnirCadastroGEOTEC
-from Instrumento import Instrumento
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -35,10 +34,12 @@ DFT_PARSE_DATES = [
     "Hora da Medição"
     ]
 
+################ ENTRADAS ################
 PATH_FOLDER = "data\Historico\Historico-Jan2025\\"
 PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = PATH_FOLDER+"2298_Instrumento-01-02-2025-154527.xlsx"
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico.xlsx"
+##########################################
 
 log.info("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
