@@ -97,7 +97,7 @@ def isEvery(iterable,type_):
 
 def intervaloPerfeito(valores,
                       nDiv=5,
-                      dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
+                      dVDefault=(0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
     """Substitui a função intervaloPerfeito_old2 anterior"""
     valores = tuple(dropNone(valores))
     log.debug(valores) #############################################################
