@@ -307,8 +307,8 @@ for grafico in graphSetting["Nome do gráfico"]:
                 kwargs = setups_series_niveis_notaveis["Cota do Topo"]
                 list_series.append(Serie(datas,valores,**kwargs))
         
-        # Adição os valores das datas máximas e mínimas dos instrumentos sem ser a pluviometria na lista de limites de datas
-        if instrumento!="AGLPL001":
+        # Adição os valores das datas máximas e mínimas dos instrumentos sem ser os instrumentos no eixo secundário
+        if not toSecundary:
             listaLimitesDatas.append(instrumento_obj.data_hora_minima)
             listaLimitesDatas.append(instrumento_obj.data_hora_maxima)
         
@@ -329,6 +329,7 @@ for grafico in graphSetting["Nome do gráfico"]:
     xInicial = df_graph["Data Inicial"].values[0]
     xFinal = df_graph["Data Final"].values[0]
     tituloYPrinc = df_graph["Título do Eixo Vertical Principal"].values[0]
+    tituloY2Princ = df_graph["Título do Eixo Vertical Secundário"].values[0]
     yInicial = df_graph["Y Inicial"].values[0]
     yFinal = df_graph["Y Final"].values[0]
     y2Inicial = df_graph["Y2 Inicial"].values[0]
@@ -375,9 +376,9 @@ for grafico in graphSetting["Nome do gráfico"]:
             log.warning(f"Gráfico {grafico} tem um período de ~{periodo_meses} mês(es), por isso o intervalo dos ticks foi atualizado para {nMonthLocator} meses.")
     else:
         if len(list_series)<=1:
-            if list_series[0].label=="AGLPL001":
+            if list_series[0].toSecundary:
                 print("\n"*4)
-                log.warning(f"\n\nO único instrumento que tem nesse gráfico é a pluviometria no eixo secundário {list_series[0].label}.\nEsse gráfico não pode ser gerado com a versão atual do programa. Contatar desenvolvedor do programa.\nAperte ENTER para confirmar a ciência dessa informação")
+                log.warning(f"\n\nO único instrumento que tem no gráfico {grafico} é o {list_series[0].label} e ele está no eixo secundário.\n\n-----------> Esse gráfico não pode ser gerado dessa forma com a versão atual do programa.\nPara corrigir, coloque ele no eixo principal.\nAperte ENTER para confirmar a ciência dessa informação")
                 input_str = input("\n")
                 continue
     
@@ -395,6 +396,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         ylim=ylim,
         y2lim=y2lim,
         yLabel=tituloYPrinc,
+        y2Label=tituloY2Princ,
         # legendNcols = 6,
         xMajorLocator = xMajorLocator,
         xLabelFontsize = 10,
