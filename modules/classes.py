@@ -439,6 +439,7 @@ class Graphic():
         self.title = title
 
     def save (self,path:str,dpi=500,bbox_inches='tight',showLog=False):
+        log.info(f"Salvando imagem: {path}") if showLog else 0
         self.fig.savefig(path,dpi=dpi,bbox_inches=bbox_inches)
         log.info(f"Imagem salva: {path}") if showLog else 0
     
@@ -634,6 +635,7 @@ class Instrumento():
     
     def descrever(self,file_path:str=""):
         relatorio = f"{self.tipo} {self.codigo} - {self.tipo_estrutura} {self.estrutura}\n\n"
+        log.info(f"Gerando relatório do instrumento {self.codigo}")
         relatorio += f"""LEITURAS OUTLIERS:\n{self.leituras_outliers[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""            
         relatorio += f"""LEITURAS ACIMA DE NÍVEL DE CONTROLE:\n{self.leituras_acima_nv_controle[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
@@ -645,4 +647,5 @@ class Instrumento():
         if file_path:
             with open(file=file_path,mode="a") as file:
                 file.write(relatorio)
+                log.info(f"Salvando relatório do instrumento {self.codigo} no caminho {file_path}")
         return relatorio
