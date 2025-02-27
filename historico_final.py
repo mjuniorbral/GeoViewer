@@ -173,9 +173,20 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
         if not pd.isna(outlier_max):
-            df_filtered = df_filtered[df_filtered["Valor"]<outlier_max]
-        if not pd.isna(outlier_max):
-            df_filtered = df_filtered[df_filtered["Valor"]<outlier_max]
+            leituras_removidas_outlier_max:pd.DataFrame = df_filtered[df_filtered["Código do Instrumento"]==instrumento][df_filtered["Valor"]>=outlier_max]
+            if len(leituras_removidas_outlier_max)>0:
+                log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_max {outlier_max} retirou {len(leituras_removidas_outlier_max)} leitura(s) apresentadas abaixo:\n{leituras_removidas_outlier_max.to_string()}")
+                df_filtered = df_filtered[df_filtered["Valor"]<outlier_max]
+            else:
+                log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_max {outlier_max} não retirou nenhuma leitura.")
+
+        if not pd.isna(outlier_min):
+            leituras_removidas_outlier_min:pd.DataFrame = df_filtered[df_filtered["Código do Instrumento"]==instrumento][df_filtered["Valor"]<=outlier_min]
+            if len(leituras_removidas_outlier_min)>0:
+                log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_min {outlier_min} retirou {len(leituras_removidas_outlier_min)} leitura(s) apresentadas abaixo:\n{leituras_removidas_outlier_min.to_string()}")
+                df_filtered = df_filtered[df_filtered["Valor"]>outlier_min]
+            else:
+                log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_min {outlier_min} não retirou nenhuma leitura.")
         
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
