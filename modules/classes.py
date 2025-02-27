@@ -508,9 +508,11 @@ class Instrumento():
         pass
 
     def set_leituras(self,df:DataFrame):
+        # Guardando leituras brutas
         self.df_leituras = df.copy()
+        # Inicializando variável de filtragem de leituras
         df_mod = df.copy()
-
+        # Inicializando atributos do Instrumento
         df_vazio = DataFrame([],columns=df_mod.columns)
         
         self.leituras_nao_realizada = df_vazio.copy()
@@ -531,15 +533,18 @@ class Instrumento():
         self.possui_leituras = True
         self.unidades_lidas = ""
         
+        # Verificando se há leituras no df_mod
         if df_mod.shape[0]==0:
             self.possui_leituras = False
             self.registro_unico_diario = False
             log.info(f"{self.codigo} sem leituras em seu Leitura.df_leituras")
             return
+        # Verificando se há mais de uma leitura em um dado dia
         elif df_mod["Data de Medição"].value_counts().max()>1:
             log.warning(f"{self.codigo} registrou mais de uma leitura no mesmo dia")
             self.registro_unico_diario = False
 
+        # Somando data com hora
         hora_em_time = df_mod.apply(lambda row: timeToTimedelta(row['Hora da Medição']), axis=1)
         try:
             df_mod["Hora da Medição"] = hora_em_time
@@ -556,17 +561,22 @@ class Instrumento():
                     log.critical(self.codigo)
                     log.critical(df_mod.to_string())
                     raise Exception()
+        
         # Ordenando o dataframe conforme a DATA e HORA da medição
         df_mod = df_mod.sort_values("Data/Hora")
         
+        # Isolando as leituras problemáticas
         self.leituras_nao_realizada = df_mod[df_mod["Situação da Medição"]=="Não Realizada"]
         self.leituras_outliers = df_mod[df_mod["Outlier"]=="SIM"]
         self.leituras_negativas = df_mod[df_mod["Valor"]<0]
         
+        # Filtrando as leituras Não Outliers e Realizadas
         df_mod = df_mod[df_mod["Situação da Medição"]=="Realizada"]
         df_mod = df_mod[isna(df_mod["Outlier"])]
+        # Isolando as leituras sem Valor registrado (não outliers e realizada)
         self.leituras_nulas = df_mod[isna(df_mod["Valor"])]
         
+        # Preenchendo os valores da leituras secas e jorrantes com o valor da cota de fundo/base ou topo
         valores_secos_jorrantes = Series(df_mod[~isna(df_mod["Condição Adversa"])]["Valor"])
         if not (len(valores_secos_jorrantes)==0): # Há leituras secas e jorrantes
             valores_secos_jorrantes = valores_secos_jorrantes.dropna()
@@ -584,6 +594,7 @@ class Instrumento():
         self.leituras_jorrantes = df_mod[df_mod["Condição Adversa"]=="JORRANTE"]
         self.leituras_nao_secas = df_mod[isna(df_mod["Condição Adversa"])]
         
+        # Retirando as leituras acima da cota de topo e abaixo da cota de fundo
         if (self.fundo_ou_base,self.topo)==(None,)*2:
             log.warning(f"Instrumento {self.codigo} sem cadastro de topo e base/fundo.")
         else:
@@ -601,7 +612,7 @@ class Instrumento():
             else:
                 log.warning(f"Instrumento {self.codigo} sem cadastro de base/fundo.")
                 
-
+        # Registrando leituras_válidas, unidades_lidas e porcentagem_seco
         self.leituras_validas = df_mod.copy()
         self.unidades_lidas = self.leituras_validas["Unidade de Medida"].copy().drop_duplicates().dropna().to_list()
         self.n_secos = len(self.leituras_secas)
@@ -621,6 +632,7 @@ class Instrumento():
         elif self.emergencia != None:
             self.leituras_acima_nv_controle = df_mod[df_mod["Valor"]>=self.emergencia]
         
+        # Registrando limites nas duas dimensões (máximos e mínimos) e tamanho de período de leitura
         self.data_maxima = self.leituras_validas["Data de Medição"].max()
         self.data_minima = self.leituras_validas["Data de Medição"].min()
         self.data_hora_maxima = self.leituras_validas["Data/Hora"].max()
