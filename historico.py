@@ -205,7 +205,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
 
         # Salvando relatório de descrição do instrumento no PATH_OUT
-        instrumento_obj.descrever(filepath=PATH_OUT+str(instrumento_obj.codigo)+".txt")
+        instrumento_obj.descrever(file_path=PATH_OUT+str(instrumento_obj.codigo)+".txt")
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
         if toSecundary:
