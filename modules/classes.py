@@ -208,9 +208,9 @@ class Graphic():
             y2lim = (None,None),
             xMajorFormatter = DateFormatter("%m/%Y"),
             xMinorFormatter = "",
-            yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
+            yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(1)), # Alterado em 27/02/2025, valor anterior era 2 casas
             yMinorFormatter = "",
-            y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(2)),
+            y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(0)), # Alterado em 27/02/2025, valor anterior era 2 casas
             y2MinorFormatter = "",
             xMajorLocator = MonthLocator(interval=1),
             xMinorLocator = MonthLocator(interval=1),
