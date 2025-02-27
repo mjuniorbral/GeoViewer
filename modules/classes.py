@@ -559,7 +559,9 @@ class Instrumento():
         
         self.leituras_nao_realizada = df_mod[df_mod["Situação da Medição"]=="Não Realizada"]
         self.leituras_outliers = df_mod[df_mod["Outlier"]=="SIM"]
+        self.leituras_negativas = df_mod[df_mod["Valor"]<0]
         
+        df_mod = df_mod[df_mod["Valor"]>=0]
         df_mod = df_mod[df_mod["Situação da Medição"]=="Realizada"]
         df_mod = df_mod[isna(df_mod["Outlier"])]
         self.leituras_nulas = df_mod[isna(df_mod["Valor"])]
@@ -638,6 +640,7 @@ class Instrumento():
         relatorio += f"""LEITURAS ACIMA DA COTA DE TOPO:\n{self.leituras_acima_topo[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NÃO REALIZADAS:\n{self.leituras_nao_realizada[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NULAS:\n{self.leituras_nulas[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
+        relatorio += f"""LEITURAS NEGATIVAS:\n{self.leituras_negativas[["Data de Medição","Hora da Medição","Valor","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio+="---------------\n"
         if file_path:
             with open(file=file_path,mode="a") as file:
