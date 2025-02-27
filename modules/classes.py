@@ -1,32 +1,52 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 from matplotlib.dates import DateFormatter,DayLocator,MonthLocator,YearLocator
 from matplotlib.ticker import AutoLocator,AutoMinorLocator, MultipleLocator,FuncFormatter
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import rcParams
-import datetime
+
+from pandas import (
+    Series,
+    DataFrame,
+    Timestamp,
+    Timedelta,
+    isna,
+    concat
+    )
+
 if __name__=="__main__":
     from log import log
-    from functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
-    from annotate import *
+    from functions import (
+        pullValues,
+        getFunctionToFuncFormatter,
+        intervaloPerfeito,
+        intervaloPerfeitoData,
+        isEvery,
+        reduzir_a_um,
+        timeToTimedelta,
+        somar_data_e_hora
+        )
 else:
     from .log import log
-    from .functions import pullValues, getFunctionToFuncFormatter, intervaloPerfeito, intervaloPerfeitoData, isEvery
-    from .annotate import *
+    from .functions import (
+        pullValues,
+        getFunctionToFuncFormatter,
+        intervaloPerfeito,
+        intervaloPerfeitoData,
+        isEvery,
+        reduzir_a_um,
+        timeToTimedelta,
+        somar_data_e_hora
+        )
 
 plt.rcParams["legend.fontsize"] = 11
 plt.rcParams['figure.constrained_layout.use'] = True
 
-X = pd.DataFrame(np.linspace(0.5, 3.5, 20))
-Y = pd.DataFrame(3+np.cos(X))
-
 class Serie():
     
     def __init__(self,X,Y,type="plot",label=None,color=None,toSecundary=False,showLegend=True,setup=dict()) -> None:
-        self.data:pd.DataFrame = pd.concat([X,Y],axis=1)
+        self.data:DataFrame = concat([X,Y],axis=1)
         self.data = self.data.dropna()
         self.nameX = self.data.columns[0]
         self.X = self.data.iloc[:,0]
@@ -294,7 +314,7 @@ class Graphic():
             else:
                 yValores.extend(serie.yLim)
         if self.setup["xlim"]==(None,None):
-            if isEvery(xValores,pd.Timestamp):
+            if isEvery(xValores,Timestamp):
                 self.setup.update(dict(xlim=intervaloPerfeitoData(xValores)))
             else:
                 self.setup.update(dict(xlim=intervaloPerfeito(xValores)))
@@ -437,9 +457,5 @@ class Grafico3D(Graphic):
         """!!!!!! Ainda não implementado !!!!!!"""
         super().__init__(series, width, height)
 
-EMPTY_SERIE_SECO = Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle=""))
+EMPTY_SERIE_SECO = Serie(DataFrame([],columns=["Data"]),DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle=""))
 
-if __name__=="__main__":
-    graph = Graphic(series=[Serie(X,Y,label="barra",type="bar",color="red"),Serie(X,Y,label="plot",color="yellow"),Serie(X,Y,label="plot2",toSecundary=True,color="blue")])
-    graph.render()
-    graph.save("1.png",showLog=True)
