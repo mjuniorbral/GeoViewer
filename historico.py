@@ -40,7 +40,7 @@ DFT_PARSE_DATES = [
 PATH_FOLDER = "data\\"
 PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico-teste.xlsx"
+PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
 PATH_OUT = "images/nivelGrafico/"
@@ -154,10 +154,8 @@ for grafico in graphSetting["Nome do gráfico"]:
         toSecundary = df_instr["Eixo Secundário"].values[0]
         outlier_max = df_instr["outlier_max"].values[0]
         outlier_min = df_instr["outlier_min"].values[0]
-        verificarSeco = df_instr["Verificar seco"].values[0] #################################### OBSOLETO ############################## <<<-------
         showLegend = df_instr["Mostrar na Legenda"].values[0]
         marker = df_instr["Marcador"].values[0]
-        temTeste = df_instr["Testes de Vida"].values[0]
         temAtencao = df_instr["Atenção"].values[0]
         temAlerta = df_instr["Alerta"].values[0]
         temEmerg = df_instr["Emergência"].values[0]
@@ -336,7 +334,6 @@ for grafico in graphSetting["Nome do gráfico"]:
     y2Inicial = df_graph["Y2 Inicial"].values[0]
     y2Final = df_graph["Y2 Final"].values[0]
     nMonthLocator = df_graph["Distância em Meses dos Tickers"].values[0]
-    hasSecos = df_graph["Tem Seco"].values[0] #################################### OBSOLETO ############################## <<<-------
     
     # Adicionando os valores de maior prioridade nas tuplas de limites dos gráficos, caso há valores nas variáveis de limites
     if len(listaLimitesDatas)!=0:
@@ -422,7 +419,6 @@ for grafico in graphSetting["Nome do gráfico"]:
                 y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(nCasaY2))
                 )
             )
-    
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
