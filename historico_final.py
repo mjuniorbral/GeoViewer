@@ -33,6 +33,7 @@ DFT_PARSE_DATES = [
     "Data de Medição",
     "Hora da Medição"
     ]
+DFT_DECIMAL = ","
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\Historico\Historico-Jan2025\\"
@@ -42,7 +43,7 @@ PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico.xlsx"
 ##########################################
 
 log.info("Importando leituras")
-df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True)
+df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True,decimal=DFT_DECIMAL)
 df["Hora da Medição"] = df["Hora da Medição"].dt.time
 log.info("Leituras importadas e tratadas\n\n")
 
