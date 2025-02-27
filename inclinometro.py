@@ -179,23 +179,23 @@ dataTree = dict(
     axisX = {
         "desloc_A":dict(label = "Deslocamento  - eixo A (mm)", xmax = 8), # Valor anterior 20 (alterado em 04/11/2024)
         "desloc_B":dict(label="Deslocamento  - eixo B (mm)", xmax = 8), # Valor anterior 20 (alterado em 04/11/2024)
-        # "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
-        # "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
-        # "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
-        # "desvio_B":dict(label="Desvio (mm) - eixo B", xmax = 20),
-        # "face_A+_mm":dict(label="Leitura A+ (mm)", xmax = 20),
-        # "face_A-_mm":dict(label="Leitura A- (mm)", xmax = 20),
-        # "face_B+_mm":dict(label="Leitura B+ (mm)", xmax = 20),
-        # "face_B-_mm":dict(label="Leitura B- (mm)", xmax = 20),
-        # "perfil_A":dict(label="Perfil A - (mm)", xmax = 600),
-        # "perfil_B":dict(label="Perfil B - (mm)", xmax = 600),
+        "checksum_A":dict(label="Checksum - eixo A (mm)", xmax = 6),
+        "checksum_B":dict(label="Checksum - eixo B (mm)", xmax = 6),
+        "desvio_A":dict(label="Desvio (mm) - eixo A", xmax = 20),
+        "desvio_B":dict(label="Desvio (mm) - eixo B", xmax = 20),
+        "face_A+_mm":dict(label="Leitura A+ (mm)", xmax = 20),
+        "face_A-_mm":dict(label="Leitura A- (mm)", xmax = 20),
+        "face_B+_mm":dict(label="Leitura B+ (mm)", xmax = 20),
+        "face_B-_mm":dict(label="Leitura B- (mm)", xmax = 20),
+        "perfil_A":dict(label="Perfil A - (mm)", xmax = 600),
+        "perfil_B":dict(label="Perfil B - (mm)", xmax = 600),
     },
     axisY = {"Depth":"Profundidade (m)"}
 )
 
 lista_inc = [
     "inc001",
-    # "inc002",
+    "inc002",
     "inc002_2"
     ]
 
