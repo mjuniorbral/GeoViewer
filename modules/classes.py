@@ -562,7 +562,6 @@ class Instrumento():
         self.leituras_outliers = df_mod[df_mod["Outlier"]=="SIM"]
         self.leituras_negativas = df_mod[df_mod["Valor"]<0]
         
-        df_mod = df_mod[df_mod["Valor"]>=0]
         df_mod = df_mod[df_mod["Situação da Medição"]=="Realizada"]
         df_mod = df_mod[isna(df_mod["Outlier"])]
         self.leituras_nulas = df_mod[isna(df_mod["Valor"])]
@@ -577,6 +576,7 @@ class Instrumento():
 
         # Excluindo leituras sem valor depois do filtro de Outliers, Leituras Realizadas e Preenchimento dos SECOS e JORRANTES
         df_mod = df_mod[~isna(df_mod["Valor"])]
+        df_mod = df_mod[df_mod["Valor"]>=0]
         
         # Separando as leituras em atributos de acordo com a Condição Adversa
         self.leituras_secas = df_mod[df_mod["Condição Adversa"]=="SECO"]
