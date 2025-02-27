@@ -12,3 +12,6 @@ handler.setFormatter(formatter)
 log = getLogger(__name__)
 log.addHandler(handler)
 log.setLevel(DEBUG)
+
+log_file = "operacoes.log"
+logging.basicConfig(filename=log_file)
