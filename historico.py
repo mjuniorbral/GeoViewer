@@ -16,7 +16,8 @@ from modules import (
     monthByInterval,
     intervaloPerfeitoDataMes,
     minimoValido,
-    maximoValido
+    maximoValido,
+    get_decimal_places
     )
 from modules.agCadastro import UnirCadastroGEOTEC
 
@@ -353,6 +354,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             retornarValorNaoNulo(yInicial,minimoValido(intervaloValor)),
             retornarValorNaoNulo(yFinal,maximoValido(intervaloValor))
             )
+        nCasaY = get_decimal_places(dVy)
     else:
         ylim = (None,None)
         
@@ -362,6 +364,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             retornarValorNaoNulo(y2Inicial,minimoValido(intervaloValorSec)),
             retornarValorNaoNulo(y2Final,maximoValido(intervaloValorSec))
             )
+        nCasaY2 = get_decimal_places(dVy2)
     else:
         y2lim = (None,None)
         # log.warning(f"O gráfico {grafico} não será renderizado por não haver leituras nele.")
@@ -405,11 +408,18 @@ for grafico in graphSetting["Nome do gráfico"]:
         labelMajorSize = 12,
         linewidth=2.0
         )
-    if ylim!=(None,None) and y2lim!=(None,None):
+    if ylim!=(None,None):
         setup_grafico.update(
             dict(
                 yMajorLocator = MultipleLocator(dVy),
-                y2MajorLocator = MultipleLocator(dVy2)
+                yMajorFormatter = FuncFormatter(getFunctionToFuncFormatter(nCasaY))
+                )
+            )
+    if y2lim!=(None,None):
+        setup_grafico.update(
+            dict(
+                y2MajorLocator = MultipleLocator(dVy2),
+                y2MajorFormatter = FuncFormatter(getFunctionToFuncFormatter(nCasaY2))
                 )
             )
     

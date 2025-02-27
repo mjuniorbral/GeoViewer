@@ -97,7 +97,7 @@ def isEvery(iterable,type_):
 
 def intervaloPerfeito(valores,
                       nDiv=5,
-                      dVDefault=(0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
+                      dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
     """Substitui a função intervaloPerfeito_old2 anterior"""
     valores = tuple(dropNone(valores))
     log.debug(valores) #############################################################
@@ -196,6 +196,8 @@ def intervaloPerfeitoData(datas:list[pd.Timestamp],dV:int|None=None,superior=Tru
 def getFunctionToFuncFormatter(nCasasDecimais,sepDecimal=",",sepMilhar=""):
     """Função para construir uma função de formatação de float com separador de milhar e decimal customizado para a classe FuncFormatter."""
     def functionToReturn(x,pos):
+        if nCasasDecimais<=0:
+            return str(int(x))
         x = round(float(x),nCasasDecimais)
         xStr = f"{x:,}".replace(",","#")
         toReturn = xStr.replace(".","$")
@@ -435,3 +437,13 @@ def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
     else:
         return valorAVerifica
     
+def get_decimal_places(num):
+    """Estima o número de casas decimais de um float."""
+    num_str = str(num)
+    parts = num_str.split('.')
+    
+    if len(parts) == 1:  # Não há casas decimais
+        return 0
+    else:
+        decimal_part = parts[1].rstrip('0')  # Remove zeros finais
+        return len(decimal_part) if decimal_part else 0
