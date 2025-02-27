@@ -39,7 +39,7 @@ DFT_PARSE_DATES = [
 PATH_FOLDER = "data\\"
 PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
-PATH_CONFIG = PATH_FOLDER+"Config-Graficos_MON-Historico-Individual.xlsx"
+PATH_CONFIG = PATH_FOLDER+"Config-Graficos_DIO-Historico-teste.xlsx"
 ##########################################
 
 PATH_OUT = "images/nivelGrafico/"
