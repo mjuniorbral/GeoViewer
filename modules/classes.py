@@ -529,6 +529,7 @@ class Instrumento():
         self.leituras_abaixo_base = df_vazio.copy()
         self.registro_unico_diario = True
         self.possui_leituras = True
+        self.unidades_lidas = ""
         
         if df_mod.shape[0]==0:
             self.possui_leituras = False
@@ -602,6 +603,7 @@ class Instrumento():
                 
 
         self.leituras_validas = df_mod.copy()
+        self.unidades_lidas = self.leituras_validas["Unidade de Medida"].copy().drop_duplicates().dropna().to_list()
         self.n_secos = len(self.leituras_secas)
         self.n_leituras_validas = len(self.leituras_validas)
         try:
@@ -637,6 +639,7 @@ class Instrumento():
         log.info(f"Gerando relatório do instrumento {self.codigo}")
         relatorio = f"{self.codigo} - {self.tipo_estrutura} {self.estrutura}\n\n"
         relatorio += f"{self.tipo=} {self.sub_tipo=}\n"
+        relatorio += f"{self.unidades_lidas=}\n"
         relatorio += f"{self.condicao=}\n"
         relatorio += f"{self.descricao=}\n"
         relatorio += f"{self.obs=}\n"
