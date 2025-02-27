@@ -115,7 +115,7 @@ def intervaloPerfeito(valores,
             dV_=dVi
             break
     else:
-        log.critical(f"\n\n\nLOOP FOR foi iterado completamente e não achou a divisão igual a nDiv\n{L=} / {max_=} / {min_=} / {valores=}\n\n\n")
+        log.critical(f"\n\n\nLOOP FOR foi iterado completamente e não achou a divisão igual a nDiv\n{L=} / {max_=} / {min_=} / {valores=}")
         dV_ = min(dVDefault)
     log.debug(dV_) #############################################################
     correcao = 1
