@@ -420,7 +420,7 @@ class Graphic():
 
     def save (self,path:str,dpi=500,bbox_inches='tight',showLog=False):
         self.fig.savefig(path,dpi=dpi,bbox_inches=bbox_inches)
-        log.info(f"[{datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')}] Imagem salva: {path}") if showLog else 0
+        log.info(f"Imagem salva: {path}") if showLog else 0
     
     def show (self,warn=True):
         self.fig.show(warn=warn)
