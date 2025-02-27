@@ -42,6 +42,8 @@ PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos_MON-Historico-Individual.xlsx"
 ##########################################
 
+PATH_OUT = "images/nivelGrafico/"
+
 log.info("Importando leituras")
 df = pd.read_csv(PATH_LEITURAS,delimiter=DFT_DELIMITER,encoding=DFT_ENCONDING,low_memory=False,dtype=DFT_DTYPE,parse_dates=DFT_PARSE_DATES,dayfirst=True,decimal=DFT_DECIMAL)
 df["Hora da Medição"] = df["Hora da Medição"].dt.time
@@ -201,6 +203,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         if not instrumento_obj.possui_leituras:
             log.warning(f"Instrumento {instrumento_obj.codigo} não possui leitura, por isso não será renderizado.")
             continue
+        instrumento_obj.descrever(PATH_OUT+str(instrumento_obj.codigo)+".txt")
         listaInstrumentos[instrumento_obj.codigo] = instrumento_obj
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
@@ -417,7 +420,7 @@ for grafico in graphSetting["Nome do gráfico"]:
     graph = Graphic(list_series,title=title,setup=setup_grafico,hasSecundary=hasSecundary,intervalX=[xInicial,xFinal])
     graph.render(toFilter=False)
     log.debug(list_series)
-    graph.save(path=f"images/nivelGrafico/{title}.png",showLog=True)
+    graph.save(path=f"{PATH_OUT}{title}.png",showLog=True)
     log.info(f"\"{grafico}\" finalizado.\n =============================\n\n")
 
 timer_load.get_delta_time_from_time_marker("renderização")
