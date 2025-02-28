@@ -1,3 +1,11 @@
+"""
+PROGRAMA GEOVIEWER
+Objetivo: Renderizar gráficos de leituras de instrumentos e outros dados de geotecnia.
+Desenvolvedor: Marcelo Cabral dos Santos Junior (Analista Técnico de Engenharia Civil na GEOCOBA - Projetos de Engenharia (https://www.geocoba.com/))
+Data de início de desenvolvimento: 02/01/2024
+Contato: mjuniorbral@gmail.com
+"""
+
 from modules import log, Timer
 log.setLevel("INFO")
 timer_ = Timer()
