@@ -181,7 +181,9 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Resetar a leitura para cada instrumento [VARIPAVEL leituras NÃO É USADA APÓS ESSA LINHA]
         df_filtered = leituras.copy(deep=True)
+
         
+            
         # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
         if not pd.isna(outlier_max):
             leituras_removidas_outlier_max:pd.DataFrame = df_filtered[df_filtered["Código do Instrumento"]==instrumento][df_filtered["Valor"]>=outlier_max]
@@ -199,6 +201,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             else:
                 log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_min {outlier_min} não retirou nenhuma leitura.")
         
+
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
         try:
@@ -215,15 +218,20 @@ for grafico in graphSetting["Nome do gráfico"]:
 
         # Salvando relatório de descrição do instrumento no PATH_OUT
         instrumento_obj.descrever(file_path=PATH_OUT+str(instrumento_obj.codigo)+".txt")
+
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
         if toSecundary:
             hasSecundary = True
-            
+
+        # Mudando a coluna de referência de valor
+        NOME_VALOR = "Valor"
+        if instrumento_obj.tipo == "Marco Topográfico":
+            NOME_VALOR = DESLOC_Z
         # Adicionando a série de leituras
         serie = Serie(
             X = instrumento_obj.leituras_validas["Data/Hora"],
-            Y = instrumento_obj.leituras_validas["Valor"],
+            Y = instrumento_obj.leituras_validas[NOME_VALOR],
             type=type,
             label=label,
             color=color,
@@ -238,7 +246,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             temSeco=True
             serie = Serie(
                 X = instrumento_obj.leituras_secas["Data/Hora"],
-                Y = instrumento_obj.leituras_secas["Valor"],
+                Y = instrumento_obj.leituras_secas[NOME_VALOR],
                 type=type,
                 label=label,
                 color=color,
@@ -253,7 +261,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             temJorrante=True
             serie = Serie(
                 X = instrumento_obj.leituras_jorrantes["Data/Hora"],
-                Y = instrumento_obj.leituras_jorrantes["Valor"],
+                Y = instrumento_obj.leituras_jorrantes[NOME_VALOR],
                 type=type,
                 label=label,
                 color=color,
@@ -268,7 +276,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         if instrumento_obj.codigo in ["AGLEDMPZ028_A"]:
             serie = Serie(
                 X = instrumento_obj.leituras_abaixo_base["Data/Hora"],
-                Y = instrumento_obj.leituras_abaixo_base["Valor"],
+                Y = instrumento_obj.leituras_abaixo_base[NOME_VALOR],
                 type=type,
                 label=label+" (abaixo do fundo/base)",
                 color=color,
@@ -342,11 +350,15 @@ for grafico in graphSetting["Nome do gráfico"]:
         if toSecundary:
             listaLimitesValoresSec.append(instrumento_obj.valor_maximo)
             listaLimitesValoresSec.append(instrumento_obj.valor_minimo)
+            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
+            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         
         # Adição os valores dos valores y do eixo principal de todos os instrumentos
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
+            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
+            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         log.info(f"\"{instrumento_obj.codigo}\" finalizado.\n=============================")
     
     # Importando entradas dos gráficos
