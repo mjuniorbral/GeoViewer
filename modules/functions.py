@@ -427,6 +427,28 @@ def somar_data_e_hora(data:pd.Series,hora:pd.Series):
     # raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
     return pd.Series(retorno)
 
+def factory_somar_data_e_hora(campo_data = "Data de Medição", campo_hora = "Hora da Medição"):
+    def func(row):
+        data_i = row[campo_data]
+        hora_i = row[campo_hora]
+        if pd.isnull(data_i):
+            raise Exception(f"[###] Data {data_i} é não válido")
+        if isinstance(data_i,str):
+            data_i = pd.Timestamp(data_i)
+        if not isinstance(hora_i,pd.Timedelta):
+            log.debug(f"{hora_i=}:{type(hora_i)} está sendo transformado em Timedelta.")
+            if isinstance(hora_i,time):
+                hora_i = pd.Timedelta(hours=hora_i.hour,minutes=hora_i.minute,seconds=hora_i.second)
+            else:
+                hora_i = pd.Timedelta(hora_i)        
+        if pd.isnull(hora_i):
+            return data_i
+        else:
+            log.debug("somando valores")
+            log.debug(f"{data_i} + {hora_i} = {data_i+hora_i}")
+            return data_i+hora_i
+    return func
+
 def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
     if pd.isnull(valorAVerifica):
         return valorParaRetornar
