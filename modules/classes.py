@@ -25,7 +25,8 @@ if __name__=="__main__":
         isEvery,
         reduzir_a_um,
         timeToTimedelta,
-        somar_data_e_hora
+        somar_data_e_hora,
+        factory_somar_data_e_hora
         )
 else:
     from .log import log
@@ -37,7 +38,8 @@ else:
         isEvery,
         reduzir_a_um,
         timeToTimedelta,
-        somar_data_e_hora
+        somar_data_e_hora,
+        factory_somar_data_e_hora
         )
 
 plt.rcParams["legend.fontsize"] = 11
@@ -554,14 +556,17 @@ class Instrumento():
         except Exception as m:
             try:
                 log.critical(f"Função somar_data_e_hora foi usada no {self.codigo}")
-                df_mod["Data/Hora"] = somar_data_e_hora(df_mod["Data de Medição"], df_mod["Hora da Medição"])
+                df_mod["Data/Hora"] = df.apply(factory_somar_data_e_hora(), axis=1)
+                # df_mod["Data/Hora"] = somar_data_e_hora(df_mod["Data de Medição"], df_mod["Hora da Medição"])
                 raise Exception()
             except Exception as m:
                 if "###" in str(m):
                     log.critical(self.codigo)
                     log.critical(df_mod.to_string())
                     raise Exception()
-        
+                else:
+                    print(m)
+        log.debug(df_mod["Data/Hora"].to_string())
         # Ordenando o dataframe conforme a DATA e HORA da medição
         df_mod = df_mod.sort_values("Data/Hora")
         
