@@ -418,12 +418,18 @@ def somar_data_e_hora(data:pd.Series,hora:pd.Series):
     retorno = []
     if len(data)==len(hora):
         for i in data.index:
-            if pd.isnull(data[i]):
-                raise Exception(f"[###] Data {data[i]} é não válido")
-            elif pd.isnull(hora[i]):
-                retorno.append(data[i])
+            data_i = data[i]
+            hora_i = hora[i]
+            if pd.isnull(data_i):
+                raise Exception(f"[###] Data {data_i} é não válido")
+            if isinstance(data_i,str):
+                data_i = pd.Timestamp(data_i)
+            if pd.isnull(hora_i):
+                retorno.append(data_i)
             else:
-                retorno.append(data[i]+hora[i])
+                log.debug("somando valores")
+                log.debug(f"{data_i} + {hora_i} = {data_i+hora_i}")
+                retorno.append(data_i+hora_i)
     # raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
     return pd.Series(retorno)
 
