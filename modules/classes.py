@@ -660,6 +660,7 @@ class Instrumento():
         relatorio += f"{self.coordenadas=}\n"
         relatorio += f"{self.local=}\n"
         relatorio += f"{self.topo=}\n"
+        relatorio += f"{self.fundo_ou_base=}\n"
         relatorio += f"{self.base_celula=} ({self.label_cota_inferior})\n"
         relatorio += f"{self.crista_barragem=} / {self.soleira_vertedor=}\n"
         relatorio += f"{self.atencao=}\n"
