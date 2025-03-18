@@ -203,7 +203,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         try:
             instrumento_obj = Instrumento(cadastro_instrumento.to_dict(orient="records")[0])
         except Exception as m:
-            log.critical(f"ERRO FATAL NO {instrumento}: {m}. Ele não será renderizado")
+            log.critical(f"ERRO FATAL NO {instrumento}: {m}.\nEle não será renderizado")
             log.critical(cadastro_instrumento.values)
             continue
         instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
