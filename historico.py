@@ -8,8 +8,8 @@ Contato: mjuniorbral@gmail.com
 
 from modules import Timer
 from modules import log
-# log.setLevel("INFO")
-log.setLevel("ERROR")
+log.setLevel("INFO")
+# log.setLevel("ERROR")
 timer_load = Timer()
 timer_load.set_time_marker("carregamento")
 log.info("Iniciando carregamento de dados...\n\n")
