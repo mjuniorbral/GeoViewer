@@ -8,7 +8,8 @@ Contato: mjuniorbral@gmail.com
 
 from modules import Timer
 from modules import log
-log.setLevel("INFO")
+# log.setLevel("INFO")
+log.setLevel("ERROR")
 timer_load = Timer()
 timer_load.set_time_marker("carregamento")
 log.info("Iniciando carregamento de dados...\n\n")
@@ -46,8 +47,8 @@ DFT_PARSE_DATES = [
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
-PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
+PATH_LEITURAS = PATH_FOLDER+"Leituras.csv"
+PATH_CADASTRO = PATH_FOLDER+"Cadastro.xlsx"
 HEADER_CADASTRO = 0
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
