@@ -248,7 +248,11 @@ class Graphic():
             legendLoc='upper center',
             legendBbox_to_anchor = (0.5,-0.25),
             legendNcols=5,
-            labelTitleFontsize = 16
+            labelTitleFontsize = 16,
+            
+            invertXaxis = False,
+            invertYaxis = False,
+            invertY2axis = False,
         )
         self.setup.update(setup)
         self.rendered = False
@@ -420,6 +424,20 @@ class Graphic():
         self.legend:Legend = self.ax.legend(self.handles, self.labels, loc=self.setup["legendLoc"], bbox_to_anchor=self.setup["legendBbox_to_anchor"], ncols=self.setup["legendNcols"], fontsize=self.setup["legendFonteSize"])
         self.fig.tight_layout()
         self.rendered = True
+        
+        
+        log.debug(self.setup["invertYaxis"])
+        # Definindo o sentidos dos três eixos depois de montar o gráfico e definir os limites dos eixos
+        if self.setup["invertXaxis"]:
+            log.debug("\n"*10,"Invertando o eixo X","\n"*10,)
+            self.ax.invert_xaxis()
+        if self.setup["invertYaxis"]:
+            log.debug("\n"*10,"Invertando o eixo Y","\n"*10,)
+            self.ax.invert_yaxis()
+        if self.hasSecundary and self.setup["invertY2axis"]:
+            self.ax2.invert_yaxis()
+        log.debug(self.ax.yaxis_inverted())
+        
         return
 
     def get_series(self):

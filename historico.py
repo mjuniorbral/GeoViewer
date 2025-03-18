@@ -429,7 +429,11 @@ for grafico in graphSetting["Nome do gráfico"]:
         yLabelFontsize = 10,
         y2LabelFontsize = 10,
         labelMajorSize = 12,
-        linewidth=2.0
+        linewidth=2.0,
+        
+        invertXaxis = False,
+        invertYaxis = False,
+        invertY2axis = True, # Gráficos do Sistema Pontal tem a Pluviometria invertida
         )
     if ylim!=(None,None):
         setup_grafico.update(
