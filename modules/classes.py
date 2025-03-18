@@ -86,7 +86,7 @@ class Serie():
                 markeredgecolor=None,      # Cor da borda do marcador
                 markeredgewidth=1.0,       # Largura da borda do marcador
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=1,                  # Ordem na sobreposição de elementos
+                zorder=10,                 # Ordem na sobreposição de elementos
                 drawstyle='default',       # Estilo de conexão dos pontos ('default', 'steps-pre', etc.)
                 )
         elif self.type == "bar":
@@ -101,7 +101,7 @@ class Serie():
                 hatch=None,                # Padrão de preenchimento (e.g., '/', '\\', 'x', etc.)
                 label=self.label_legend,   # Nome na legenda
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=100,                # Ordem na sobreposição de elementos
+                zorder=9,                 # Ordem na sobreposição de elementos
                 # log=False,               # Escala logarítmica no eixo y
                 error_kw=None,             # Parâmetros de erro adicionais para as barras de erro
                 capsize=None,              # Tamanho das extremidades das barras de erro
@@ -287,11 +287,11 @@ class Graphic():
                 break
         if self.setup["grid"]:
             if self.hasSecundary:
-                self.ax2.grid(self.setup["grid"],axis="x")
-                self.ax.grid(self.setup["grid"],"both",axis="y")
+                self.ax2.grid(self.setup["grid"],axis="x",zorder=1)
+                self.ax.grid(self.setup["grid"],"both",axis="y",zorder=1)
             else:
-                self.ax.grid(self.setup["grid"],axis="x")
-                self.ax.grid(self.setup["grid"],"both",axis="y")
+                self.ax.grid(self.setup["grid"],axis="x",zorder=1)
+                self.ax.grid(self.setup["grid"],"both",axis="y",zorder=1)
 
         # Put the axis on the correct place
         if self.hasSecundary:
