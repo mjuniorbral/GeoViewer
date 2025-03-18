@@ -261,6 +261,23 @@ for grafico in graphSetting["Nome do gráfico"]:
                 setup=dict(marker="s",linestyle="")
                 )
             list_series.append(serie)
+
+        # Protótipo de visualização de séries problemáticas
+        # Adicionando a série abaixo da cota de fundo apenas para os instrumentos na lista na condição abaixo (HARDCODED)
+        if instrumento_obj.codigo in ["AGLEDMPZ028_A"]:
+            serie = Serie(
+                X = instrumento_obj.leituras_abaixo_base["Data/Hora"],
+                Y = instrumento_obj.leituras_abaixo_base["Valor"],
+                type=type,
+                label=label+" (abaixo do fundo/base)",
+                color=color,
+                toSecundary=toSecundary,
+                showLegend=True,
+                setup=dict(marker=11,linestyle="",markersize=4)
+                )
+            list_series.append(serie)
+            listaLimitesDatas.append(instrumento_obj.leituras_abaixo_base["Data/Hora"].min())
+            
         
         # Adicionando níveis notáveis conforme configuração na tabela
         
