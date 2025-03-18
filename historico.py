@@ -48,6 +48,7 @@ DFT_PARSE_DATES = [
 PATH_FOLDER = "data\\"
 PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
 PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
+HEADER_CADASTRO = 0
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
@@ -59,7 +60,7 @@ df["Hora da Medição"] = df["Hora da Medição"].dt.time
 log.info("Leituras importadas e tratadas\n\n")
 
 log.info("Importando cadastros")
-cadastro = UnirCadastroGEOTEC(PATH_CADASTRO)
+cadastro = UnirCadastroGEOTEC(PATH_CADASTRO,header=HEADER_CADASTRO)
 log.info("Cadastros importados\n\n")
 
 log.info("Importando configurações")
