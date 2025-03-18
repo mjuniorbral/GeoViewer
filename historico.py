@@ -166,6 +166,9 @@ for grafico in graphSetting["Nome do gráfico"]:
         outlier_min = df_instr["outlier_min"].values[0]
         showLegend = df_instr["Mostrar na Legenda"].values[0]
         marker = df_instr["Marcador"].values[0]
+        markersize = df_instr["Tamanho do Marcador"].values[0]
+        linestyle = df_instr["Estilo de Linha"].values[0]
+        linewidth = df_instr["Espessura de Linha"].values[0]
         temAtencao = df_instr["Atenção"].values[0]
         temAlerta = df_instr["Alerta"].values[0]
         temEmerg = df_instr["Emergência"].values[0]
@@ -174,9 +177,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Criando o setup de acordo com o campo do marcador do instrumento
         if pd.isna(marker):
-            setup=dict(marker="",linestyle="-")
-        else:
-            setup=dict(marker=marker,markersize=3,linestyle="-")
+            marker = ""
+        if pd.isna(linestyle):
+            linestyle = ""
+        if pd.isna(markersize):
+            markersize = 3
+        if pd.isna(linewidth):
+            linewidth = 1.5
+        setup=dict(marker=marker,markersize=markersize,linestyle=linestyle,linewidth=linewidth)
             
         
         # Resetar a leitura para cada instrumento [VARIPAVEL leituras NÃO É USADA APÓS ESSA LINHA]
