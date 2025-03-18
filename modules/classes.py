@@ -485,6 +485,17 @@ EMPTY_SERIE_SECO = Serie(DataFrame([],columns=["Data"]),DataFrame([],columns=["V
 
 
 """ Modelo de cadastro e leituras do GEOTEC """
+ATUAL_X = "Coordenada Leste (X)"
+ATUAL_Y = "Coordenada Norte (Y)"
+ATUAL_Z = "Cota (Z)"
+INICIAL_X = "Coordenada Leste Instalação (X)"
+INICIAL_Y = "Coordenada Norte Instalação (Y)"
+INICIAL_Z = "Cota Instalação (Z)"
+DESLOC_X = "Coordenada Leste Deslocamento (X) (mm)"
+DESLOC_Y = "Coordenada Norte Deslocamento (Y) (mm)"
+DESLOC_Z = "Cota Deslocamento (X) (mm)"
+
+DFT_OUTLIER_DESLOC = 500 # milimetros
 
 class Instrumento():
     def __init__(self,
@@ -635,6 +646,21 @@ class Instrumento():
             else:
                 log.warning(f"Instrumento {self.codigo} sem cadastro de base/fundo.")
                 
+        # Cálculo dos valores dx, dy, dz dos Marcos Topográficos e filtrando valores muito altos
+        
+        if self.tipo == "Marco Topográfico":
+            df_mod[DESLOC_X] = (df_mod[ATUAL_X] - self.dict_cadastro[INICIAL_X])*1000 # A deslocamento foi calculado em milímetro.
+            df_mod[DESLOC_Y] = (df_mod[ATUAL_Y] - self.dict_cadastro[INICIAL_Y])*1000 # A deslocamento foi calculado em milímetro.
+            df_mod[DESLOC_Z] = (df_mod[ATUAL_Z] - self.dict_cadastro[INICIAL_Z])*1000 # A deslocamento foi calculado em milímetro.
+            # Guardando leituras calculadas
+            self.deslocamentos_X_acima_de_10cm = df_mod[df_mod[DESLOC_X].abs() > DFT_OUTLIER_DESLOC]
+            self.deslocamentos_Y_acima_de_10cm = df_mod[df_mod[DESLOC_Y].abs() > DFT_OUTLIER_DESLOC]
+            self.deslocamentos_Z_acima_de_10cm = df_mod[df_mod[DESLOC_Z].abs() > DFT_OUTLIER_DESLOC]
+            # Filtrando leituras calculadas
+            df_mod = df_mod[df_mod[DESLOC_X].abs() <= DFT_OUTLIER_DESLOC]
+            df_mod = df_mod[df_mod[DESLOC_Y].abs() <= DFT_OUTLIER_DESLOC]
+            df_mod = df_mod[df_mod[DESLOC_Z].abs() <= DFT_OUTLIER_DESLOC]
+
         # Registrando leituras_válidas, unidades_lidas e porcentagem_seco
         self.leituras_validas = df_mod.copy()
         self.unidades_lidas = self.leituras_validas["Unidade de Medida"].copy().drop_duplicates().dropna().to_list()
@@ -697,6 +723,15 @@ class Instrumento():
         relatorio += f"""LEITURAS NÃO REALIZADAS:\n{self.leituras_nao_realizada[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NULAS:\n{self.leituras_nulas[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NEGATIVAS:\n{self.leituras_negativas[["Data de Medição","Hora da Medição","Valor","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
+        if self.tipo == "Marco Topográfico":
+            leiturasAcima10cm = [
+                self.deslocamentos_X_acima_de_10cm,
+                self.deslocamentos_Y_acima_de_10cm,
+                self.deslocamentos_Z_acima_de_10cm,
+            ]
+            leiturasAcima10cm = concat(leiturasAcima10cm)
+            
+            relatorio += f"""LEITURAS COM DESLOCAMENTOS CARTESIANOS ACIMA DE 10 CM:\n{leiturasAcima10cm[["Data de Medição","Hora da Medição","Valor",DESLOC_X,DESLOC_Y,DESLOC_Z]].to_string()}\n\n"""            
         relatorio+="---------------\n"
         if file_path:
             with open(file=file_path,mode="w") as file:
