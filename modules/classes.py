@@ -690,6 +690,8 @@ class Instrumento():
         self.valor_minimo = self.leituras_validas["Valor"].min()
         self.periodo_leituras = self.data_hora_maxima - self.data_hora_minima
         
+        self.registro_mais_recente = self.leituras_validas[self.leituras_validas["Data/Hora"]==self.data_hora_maxima]
+        
         return
 
     def __str__(self):
@@ -716,6 +718,7 @@ class Instrumento():
         relatorio += f"{self.alerta=}\n"
         relatorio += f"{self.emergencia=}\n"
         relatorio += f"{self.porcentagem_seco=}\n\n\n"
+        relatorio += f"""REGISTRO MAIS RECENTE:\n{self.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS OUTLIERS:\n{self.leituras_outliers[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""            
         relatorio += f"""LEITURAS ACIMA DE NÍVEL DE CONTROLE:\n{self.leituras_acima_nv_controle[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""

@@ -128,6 +128,7 @@ setups_series_niveis_notaveis = {
 timer_load.set_time_marker("renderização")
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
+LEITURAS_RECENTES = DataFrame([],columns=[])
 
 log.info("Carregamento de dados finalizado.\n\n\n=============================")
 
@@ -226,6 +227,9 @@ for grafico in graphSetting["Nome do gráfico"]:
 
         # Salvando relatório de descrição do instrumento no PATH_OUT
         instrumento_obj.descrever(file_path=PATH_OUT+str(instrumento_obj.codigo)+".txt")
+        
+        # Salvando leituras recentes dos instrumentos
+        LEITURAS_RECENTES = pd.concat([LEITURAS_RECENTES,instrumento_obj.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]]])
 
         
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
@@ -498,3 +502,4 @@ print("""
 | '--------------' || '--------------' || '--------------' |
  '----------------'  '----------------'  '----------------'
 """)
+print(LEITURAS_RECENTES.to_string())
