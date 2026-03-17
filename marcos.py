@@ -9,7 +9,6 @@ Contato: mjuniorbral@gmail.com
 from modules import Timer
 from modules import log
 log.setLevel("INFO")
-# log.setLevel("ERROR")
 timer_load = Timer()
 timer_load.set_time_marker("carregamento")
 log.info("Iniciando carregamento de dados...\n\n")
@@ -47,8 +46,9 @@ DFT_PARSE_DATES = [
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"LEITURAS.csv"
-PATH_CADASTRO = PATH_FOLDER+"CADASTRO_INSTRUMENTOS.xlsx"
+PATH_LEITURAS = PATH_FOLDER+"Leituras.csv"
+PATH_CADASTRO = PATH_FOLDER+"Cadastro.xlsx"
+HEADER_CADASTRO = 0
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
@@ -72,6 +72,14 @@ leituras = df.copy(deep=True)
 
 timer_load.get_delta_time_from_time_marker("carregamento")
 log.info("Configurações importadas\n\n")
+
+
+ATUAL_X = "Coordenada Leste (X)"
+ATUAL_Y = "Coordenada Norte (Y)"
+ATUAL_Z = "Cota (Z)"
+INICIAL_X = "Coordenada Leste Instalação (X)"
+INICIAL_Y = "Coordenada Norte Instalação (Y)"
+INICIAL_Z = "Cota Instalação (Z)"
 
 setups_series_niveis_notaveis = {
     "Nível de Atenção": dict(
@@ -127,7 +135,6 @@ setups_series_niveis_notaveis = {
 timer_load.set_time_marker("renderização")
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
-LEITURAS_RECENTES = DataFrame([],columns=[])
 
 log.info("Carregamento de dados finalizado.\n\n\n=============================")
 
@@ -136,7 +143,6 @@ graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
     # Inicialização das variáveis para cada gráfico
     temSeco = False
-    temTeste_de_Vida = False
     temJorrante = False
     hasSecundary = False
     listaLimitesDatas = []
@@ -167,9 +173,6 @@ for grafico in graphSetting["Nome do gráfico"]:
         outlier_min = df_instr["outlier_min"].values[0]
         showLegend = df_instr["Mostrar na Legenda"].values[0]
         marker = df_instr["Marcador"].values[0]
-        markersize = df_instr["Tamanho do Marcador"].values[0]
-        linestyle = df_instr["Estilo de Linha"].values[0]
-        linewidth = df_instr["Espessura de Linha"].values[0]
         temAtencao = df_instr["Atenção"].values[0]
         temAlerta = df_instr["Alerta"].values[0]
         temEmerg = df_instr["Emergência"].values[0]
@@ -178,21 +181,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Criando o setup de acordo com o campo do marcador do instrumento
         if pd.isna(marker):
-            marker = ""
-        if pd.isna(linestyle):
-            linestyle = ""
-        if pd.isna(markersize):
-            markersize = 3
-        if pd.isna(linewidth):
-            linewidth = 1.5
-        setup=dict(marker=marker,markersize=markersize,linestyle=linestyle,linewidth=linewidth)
+            setup=dict(marker="",linestyle="-")
+        else:
+            setup=dict(marker=marker,markersize=3,linestyle="-")
             
         
         # Resetar a leitura para cada instrumento [VARIPAVEL leituras NÃO É USADA APÓS ESSA LINHA]
         df_filtered = leituras.copy(deep=True)
-
         
-            
         # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
         if not pd.isna(outlier_max):
             leituras_removidas_outlier_max:pd.DataFrame = df_filtered[df_filtered["Código do Instrumento"]==instrumento][df_filtered["Valor"]>=outlier_max]
@@ -210,7 +206,6 @@ for grafico in graphSetting["Nome do gráfico"]:
             else:
                 log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_min {outlier_min} não retirou nenhuma leitura.")
         
-
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
         try:
@@ -228,22 +223,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         # Salvando relatório de descrição do instrumento no PATH_OUT
         instrumento_obj.descrever(file_path=PATH_OUT+str(instrumento_obj.codigo)+".txt")
         
-        # Salvando leituras recentes dos instrumentos
-        LEITURAS_RECENTES = pd.concat([LEITURAS_RECENTES,instrumento_obj.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]]])
-
-        
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
         if toSecundary:
             hasSecundary = True
-
-        # Mudando a coluna de referência de valor
-        NOME_VALOR = "Valor"
-        if instrumento_obj.tipo == "Marco Topográfico":
-            NOME_VALOR = DESLOC_Z
+            
         # Adicionando a série de leituras
         serie = Serie(
             X = instrumento_obj.leituras_validas["Data/Hora"],
-            Y = instrumento_obj.leituras_validas[NOME_VALOR],
+            Y = instrumento_obj.leituras_validas["Valor"],
             type=type,
             label=label,
             color=color,
@@ -264,21 +251,7 @@ for grafico in graphSetting["Nome do gráfico"]:
                 color=color,
                 toSecundary=toSecundary,
                 showLegend=False,
-                setup=dict(marker="x",linestyle="",markeredgecolor="black")
-                )
-            list_series.append(serie)
-            # Adicionado a série de Teste de Vida
-        if len(instrumento_obj.leituras_Teste_de_Vida)>0:
-            temTeste_de_Vida=True
-            serie = Serie(
-                X = instrumento_obj.leituras_Teste_de_Vida["Data/Hora"],
-                Y = instrumento_obj.leituras_Teste_de_Vida["Valor"],
-                type=type,
-                label=label,
-                color=color,
-                toSecundary=toSecundary,
-                showLegend=False,
-                setup=dict(marker="^",linestyle="")
+                setup=dict(marker="x",linestyle="")
                 )
             list_series.append(serie)
         
@@ -287,7 +260,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             temJorrante=True
             serie = Serie(
                 X = instrumento_obj.leituras_jorrantes["Data/Hora"],
-                Y = instrumento_obj.leituras_jorrantes[NOME_VALOR],
+                Y = instrumento_obj.leituras_jorrantes["Valor"],
                 type=type,
                 label=label,
                 color=color,
@@ -302,7 +275,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         if instrumento_obj.codigo in ["AGLEDMPZ028_A"]:
             serie = Serie(
                 X = instrumento_obj.leituras_abaixo_base["Data/Hora"],
-                Y = instrumento_obj.leituras_abaixo_base[NOME_VALOR],
+                Y = instrumento_obj.leituras_abaixo_base["Valor"],
                 type=type,
                 label=label+" (abaixo do fundo/base)",
                 color=color,
@@ -376,15 +349,11 @@ for grafico in graphSetting["Nome do gráfico"]:
         if toSecundary:
             listaLimitesValoresSec.append(instrumento_obj.valor_maximo)
             listaLimitesValoresSec.append(instrumento_obj.valor_minimo)
-            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
-            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         
         # Adição os valores dos valores y do eixo principal de todos os instrumentos
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
-            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
-            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         log.info(f"\"{instrumento_obj.codigo}\" finalizado.\n=============================")
     
     # Importando entradas dos gráficos
@@ -491,8 +460,6 @@ for grafico in graphSetting["Nome do gráfico"]:
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
-    if temTeste_de_Vida:
-        list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Teste de Vida",color="black",showLegend=True,setup=dict(marker="^",linestyle="")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
     log.debug("HEY!--------------------")
@@ -518,4 +485,3 @@ print("""
 | '--------------' || '--------------' || '--------------' |
  '----------------'  '----------------'  '----------------'
 """)
-print(LEITURAS_RECENTES.to_string())
