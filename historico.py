@@ -47,9 +47,9 @@ DFT_PARSE_DATES = [
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"Leituras.csv"
-PATH_CADASTRO = PATH_FOLDER+"Cadastro.xlsx"
 HEADER_CADASTRO = 0
+PATH_LEITURAS = PATH_FOLDER+"LEITURAS.csv"
+PATH_CADASTRO = PATH_FOLDER+"CADASTRO_INSTRUMENTOS.xlsx"
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
