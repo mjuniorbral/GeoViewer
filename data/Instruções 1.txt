@@ -1,9 +1,0 @@
-Cadastro dos instrumentos  - Só baixar do GEOTEC e colar o arquivo na pasta data com o nome CADASTRO_INSTRUMENTOS.
-
-Na atualização alimentar a planilha LEITURA com os dados dos meses que quero acrescentar no histórico.
-
-Mudar o formato das colunas de data, hora e valor, tem que estar "data", "hora" e "número".
-
-Comando para rodar o código: python .\historico.py
-
-

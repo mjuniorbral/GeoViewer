@@ -46,8 +46,9 @@ DFT_PARSE_DATES = [
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"LEITURAS.csv"
-PATH_CADASTRO = PATH_FOLDER+"CADASTRO_INSTRUMENTOS.xlsx"
+PATH_LEITURAS = PATH_FOLDER+"Leituras.csv"
+PATH_CADASTRO = PATH_FOLDER+"Cadastro.xlsx"
+HEADER_CADASTRO = 0
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
@@ -59,7 +60,7 @@ df["Hora da Medição"] = df["Hora da Medição"].dt.time
 log.info("Leituras importadas e tratadas\n\n")
 
 log.info("Importando cadastros")
-cadastro = UnirCadastroGEOTEC(PATH_CADASTRO)
+cadastro = UnirCadastroGEOTEC(PATH_CADASTRO,header=HEADER_CADASTRO)
 log.info("Cadastros importados\n\n")
 
 log.info("Importando configurações")
@@ -71,6 +72,14 @@ leituras = df.copy(deep=True)
 
 timer_load.get_delta_time_from_time_marker("carregamento")
 log.info("Configurações importadas\n\n")
+
+
+ATUAL_X = "Coordenada Leste (X)"
+ATUAL_Y = "Coordenada Norte (Y)"
+ATUAL_Z = "Cota (Z)"
+INICIAL_X = "Coordenada Leste Instalação (X)"
+INICIAL_Y = "Coordenada Norte Instalação (Y)"
+INICIAL_Z = "Cota Instalação (Z)"
 
 setups_series_niveis_notaveis = {
     "Nível de Atenção": dict(
@@ -134,7 +143,6 @@ graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
     # Inicialização das variáveis para cada gráfico
     temSeco = False
-    temTeste_de_Vida = False
     temJorrante = False
     hasSecundary = False
     listaLimitesDatas = []
@@ -203,7 +211,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         try:
             instrumento_obj = Instrumento(cadastro_instrumento.to_dict(orient="records")[0])
         except Exception as m:
-            log.critical(f"ERRO FATAL NO {instrumento}: {m}. Ele não será renderizado")
+            log.critical(f"ERRO FATAL NO {instrumento}: {m}.\nEle não será renderizado")
             log.critical(cadastro_instrumento.values)
             continue
         instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
@@ -243,21 +251,7 @@ for grafico in graphSetting["Nome do gráfico"]:
                 color=color,
                 toSecundary=toSecundary,
                 showLegend=False,
-                setup=dict(marker="x",linestyle="",markeredgecolor="black")
-                )
-            list_series.append(serie)
-            # Adicionado a série de Teste de Vida
-        if len(instrumento_obj.leituras_Teste_de_Vida)>0:
-            temTeste_de_Vida=True
-            serie = Serie(
-                X = instrumento_obj.leituras_Teste_de_Vida["Data/Hora"],
-                Y = instrumento_obj.leituras_Teste_de_Vida["Valor"],
-                type=type,
-                label=label,
-                color=color,
-                toSecundary=toSecundary,
-                showLegend=False,
-                setup=dict(marker="^",linestyle="")
+                setup=dict(marker="x",linestyle="")
                 )
             list_series.append(serie)
         
@@ -275,6 +269,23 @@ for grafico in graphSetting["Nome do gráfico"]:
                 setup=dict(marker="s",linestyle="")
                 )
             list_series.append(serie)
+
+        # Protótipo de visualização de séries problemáticas
+        # Adicionando a série abaixo da cota de fundo apenas para os instrumentos na lista na condição abaixo (HARDCODED)
+        if instrumento_obj.codigo in ["AGLEDMPZ028_A"]:
+            serie = Serie(
+                X = instrumento_obj.leituras_abaixo_base["Data/Hora"],
+                Y = instrumento_obj.leituras_abaixo_base["Valor"],
+                type=type,
+                label=label+" (abaixo do fundo/base)",
+                color=color,
+                toSecundary=toSecundary,
+                showLegend=True,
+                setup=dict(marker=11,linestyle="",markersize=4)
+                )
+            list_series.append(serie)
+            listaLimitesDatas.append(instrumento_obj.leituras_abaixo_base["Data/Hora"].min())
+            
         
         # Adicionando níveis notáveis conforme configuração na tabela
         
@@ -426,7 +437,11 @@ for grafico in graphSetting["Nome do gráfico"]:
         yLabelFontsize = 10,
         y2LabelFontsize = 10,
         labelMajorSize = 12,
-        linewidth=2.0
+        linewidth=2.0,
+        
+        invertXaxis = False,
+        invertYaxis = False,
+        invertY2axis = True, # Gráficos do Sistema Pontal tem a Pluviometria invertida
         )
     if ylim!=(None,None):
         setup_grafico.update(
@@ -445,8 +460,6 @@ for grafico in graphSetting["Nome do gráfico"]:
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
-    if temTeste_de_Vida:
-        list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Teste de Vida",color="black",showLegend=True,setup=dict(marker="^",linestyle="")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
     log.debug("HEY!--------------------")
