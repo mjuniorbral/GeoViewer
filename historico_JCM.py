@@ -9,7 +9,6 @@ Contato: mjuniorbral@gmail.com
 from modules import Timer
 from modules import log
 log.setLevel("INFO")
-# log.setLevel("ERROR")
 timer_load = Timer()
 timer_load.set_time_marker("carregamento")
 log.info("Iniciando carregamento de dados...\n\n")
@@ -60,7 +59,7 @@ df["Hora da Medição"] = df["Hora da Medição"].dt.time
 log.info("Leituras importadas e tratadas\n\n")
 
 log.info("Importando cadastros")
-cadastro = UnirCadastroGEOTEC(PATH_CADASTRO,header=HEADER_CADASTRO)
+cadastro = UnirCadastroGEOTEC(PATH_CADASTRO)
 log.info("Cadastros importados\n\n")
 
 log.info("Importando configurações")
@@ -127,7 +126,6 @@ setups_series_niveis_notaveis = {
 timer_load.set_time_marker("renderização")
 # Inicializando a variável de armazenamento dos instrumentos
 listaInstrumentos = dict()
-LEITURAS_RECENTES = DataFrame([],columns=[])
 
 log.info("Carregamento de dados finalizado.\n\n\n=============================")
 
@@ -167,9 +165,6 @@ for grafico in graphSetting["Nome do gráfico"]:
         outlier_min = df_instr["outlier_min"].values[0]
         showLegend = df_instr["Mostrar na Legenda"].values[0]
         marker = df_instr["Marcador"].values[0]
-        markersize = df_instr["Tamanho do Marcador"].values[0]
-        linestyle = df_instr["Estilo de Linha"].values[0]
-        linewidth = df_instr["Espessura de Linha"].values[0]
         temAtencao = df_instr["Atenção"].values[0]
         temAlerta = df_instr["Alerta"].values[0]
         temEmerg = df_instr["Emergência"].values[0]
@@ -178,21 +173,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         
         # Criando o setup de acordo com o campo do marcador do instrumento
         if pd.isna(marker):
-            marker = ""
-        if pd.isna(linestyle):
-            linestyle = ""
-        if pd.isna(markersize):
-            markersize = 3
-        if pd.isna(linewidth):
-            linewidth = 1.5
-        setup=dict(marker=marker,markersize=markersize,linestyle=linestyle,linewidth=linewidth)
+            setup=dict(marker="",linestyle="-")
+        else:
+            setup=dict(marker=marker,markersize=3,linestyle="-")
             
         
         # Resetar a leitura para cada instrumento [VARIPAVEL leituras NÃO É USADA APÓS ESSA LINHA]
         df_filtered = leituras.copy(deep=True)
-
         
-            
         # Retirada das leituras fora do intervalo definido pelo Outlier na planilha Config
         if not pd.isna(outlier_max):
             leituras_removidas_outlier_max:pd.DataFrame = df_filtered[df_filtered["Código do Instrumento"]==instrumento][df_filtered["Valor"]>=outlier_max]
@@ -210,13 +198,12 @@ for grafico in graphSetting["Nome do gráfico"]:
             else:
                 log.info(f"{instrumento} no gráfico {grafico}: Filtro de outlier_min {outlier_min} não retirou nenhuma leitura.")
         
-
         # Criando o objeto Instrumento para extrair os valores
         cadastro_instrumento:pd.DataFrame = cadastro.loc[cadastro["Código"]==instrumento]
         try:
             instrumento_obj = Instrumento(cadastro_instrumento.to_dict(orient="records")[0])
         except Exception as m:
-            log.critical(f"ERRO FATAL NO {instrumento}: {m}.\nEle não será renderizado")
+            log.critical(f"ERRO FATAL NO {instrumento}: {m}. Ele não será renderizado")
             log.critical(cadastro_instrumento.values)
             continue
         instrumento_obj.set_leituras(df_filtered[df_filtered["Código do Instrumento"]==instrumento_obj.codigo])
@@ -228,22 +215,14 @@ for grafico in graphSetting["Nome do gráfico"]:
         # Salvando relatório de descrição do instrumento no PATH_OUT
         instrumento_obj.descrever(file_path=PATH_OUT+str(instrumento_obj.codigo)+".txt")
         
-        # Salvando leituras recentes dos instrumentos
-        LEITURAS_RECENTES = pd.concat([LEITURAS_RECENTES,instrumento_obj.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]]])
-
-        
         # Caso alguma série tenha secundário, podemos mudar para True a variável inicializada como False no início do loop do gráfico
         if toSecundary:
             hasSecundary = True
-
-        # Mudando a coluna de referência de valor
-        NOME_VALOR = "Valor"
-        if instrumento_obj.tipo == "Marco Topográfico":
-            NOME_VALOR = DESLOC_Z
+            
         # Adicionando a série de leituras
         serie = Serie(
             X = instrumento_obj.leituras_validas["Data/Hora"],
-            Y = instrumento_obj.leituras_validas[NOME_VALOR],
+            Y = instrumento_obj.leituras_validas["Valor"],
             type=type,
             label=label,
             color=color,
@@ -287,7 +266,7 @@ for grafico in graphSetting["Nome do gráfico"]:
             temJorrante=True
             serie = Serie(
                 X = instrumento_obj.leituras_jorrantes["Data/Hora"],
-                Y = instrumento_obj.leituras_jorrantes[NOME_VALOR],
+                Y = instrumento_obj.leituras_jorrantes["Valor"],
                 type=type,
                 label=label,
                 color=color,
@@ -296,23 +275,6 @@ for grafico in graphSetting["Nome do gráfico"]:
                 setup=dict(marker="s",linestyle="")
                 )
             list_series.append(serie)
-
-        # Protótipo de visualização de séries problemáticas
-        # Adicionando a série abaixo da cota de fundo apenas para os instrumentos na lista na condição abaixo (HARDCODED)
-        if instrumento_obj.codigo in ["AGLEDMPZ028_A"]:
-            serie = Serie(
-                X = instrumento_obj.leituras_abaixo_base["Data/Hora"],
-                Y = instrumento_obj.leituras_abaixo_base[NOME_VALOR],
-                type=type,
-                label=label+" (abaixo do fundo/base)",
-                color=color,
-                toSecundary=toSecundary,
-                showLegend=True,
-                setup=dict(marker=11,linestyle="",markersize=4)
-                )
-            list_series.append(serie)
-            listaLimitesDatas.append(instrumento_obj.leituras_abaixo_base["Data/Hora"].min())
-            
         
         # Adicionando níveis notáveis conforme configuração na tabela
         
@@ -376,15 +338,11 @@ for grafico in graphSetting["Nome do gráfico"]:
         if toSecundary:
             listaLimitesValoresSec.append(instrumento_obj.valor_maximo)
             listaLimitesValoresSec.append(instrumento_obj.valor_minimo)
-            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
-            listaLimitesValoresSec.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         
         # Adição os valores dos valores y do eixo principal de todos os instrumentos
         else:
             listaLimitesValores.append(instrumento_obj.valor_maximo)
             listaLimitesValores.append(instrumento_obj.valor_minimo)
-            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].max())
-            listaLimitesValores.append(instrumento_obj.leituras_validas[NOME_VALOR].min())
         log.info(f"\"{instrumento_obj.codigo}\" finalizado.\n=============================")
     
     # Importando entradas dos gráficos
@@ -468,11 +426,7 @@ for grafico in graphSetting["Nome do gráfico"]:
         yLabelFontsize = 10,
         y2LabelFontsize = 10,
         labelMajorSize = 12,
-        linewidth=2.0,
-        
-        invertXaxis = False,
-        invertYaxis = False,
-        invertY2axis = True, # Gráficos do Sistema Pontal tem a Pluviometria invertida
+        linewidth=2.0
         )
     if ylim!=(None,None):
         setup_grafico.update(
@@ -518,4 +472,3 @@ print("""
 | '--------------' || '--------------' || '--------------' |
  '----------------'  '----------------'  '----------------'
 """)
-print(LEITURAS_RECENTES.to_string())

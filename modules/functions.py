@@ -97,7 +97,7 @@ def isEvery(iterable,type_):
 
 def intervaloPerfeito(valores,
                       nDiv=5,
-                      dVDefault=(0.001, 0.002, 0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
+                      dVDefault=(0.01, 0.02, 0.025, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 10000, 10000)):
     """Substitui a função intervaloPerfeito_old2 anterior"""
     valores = tuple(dropNone(valores))
     log.debug(valores) #############################################################
@@ -418,42 +418,14 @@ def somar_data_e_hora(data:pd.Series,hora:pd.Series):
     retorno = []
     if len(data)==len(hora):
         for i in data.index:
-            data_i = data[i]
-            hora_i = hora[i]
-            if pd.isnull(data_i):
-                raise Exception(f"[###] Data {data_i} é não válido")
-            if isinstance(data_i,str):
-                data_i = pd.Timestamp(data_i)
-            if pd.isnull(hora_i):
-                retorno.append(data_i)
+            if pd.isnull(data[i]):
+                raise Exception(f"[###] Data {data[i]} é não válido")
+            elif pd.isnull(hora[i]):
+                retorno.append(data[i])
             else:
-                log.debug("somando valores")
-                log.debug(f"{data_i} + {hora_i} = {data_i+hora_i}")
-                retorno.append(data_i+hora_i)
+                retorno.append(data[i]+hora[i])
     # raise Exception("Função somar_data_e_hora não implementada ainda. Falar com desenvolvedor do programa.")
     return pd.Series(retorno)
-
-def factory_somar_data_e_hora(campo_data = "Data de Medição", campo_hora = "Hora da Medição"):
-    def func(row):
-        data_i = row[campo_data]
-        hora_i = row[campo_hora]
-        if pd.isnull(data_i):
-            raise Exception(f"[###] Data {data_i} é não válido")
-        if isinstance(data_i,str):
-            data_i = pd.Timestamp(data_i)
-        if not isinstance(hora_i,pd.Timedelta):
-            log.debug(f"{hora_i=}:{type(hora_i)} está sendo transformado em Timedelta.")
-            if isinstance(hora_i,time):
-                hora_i = pd.Timedelta(hours=hora_i.hour,minutes=hora_i.minute,seconds=hora_i.second)
-            else:
-                hora_i = pd.Timedelta(hora_i)        
-        if pd.isnull(hora_i):
-            return data_i
-        else:
-            log.debug("somando valores")
-            log.debug(f"{data_i} + {hora_i} = {data_i+hora_i}")
-            return data_i+hora_i
-    return func
 
 def retornarValorNaoNulo(valorAVerifica,valorParaRetornar):
     if pd.isnull(valorAVerifica):
