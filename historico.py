@@ -506,7 +506,7 @@ for grafico in graphSetting["Nome do gráfico"]:
 
 timer_load.get_delta_time_from_time_marker("renderização")
 
-print("""
+print(r"""
  .----------------.  .----------------.  .----------------.
 | .--------------. || .--------------. || .--------------. |
 | |  _________   | || |     _____    | || | ____    ____ | |
