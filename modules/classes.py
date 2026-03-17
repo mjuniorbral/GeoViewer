@@ -25,7 +25,8 @@ if __name__=="__main__":
         isEvery,
         reduzir_a_um,
         timeToTimedelta,
-        somar_data_e_hora
+        somar_data_e_hora,
+        factory_somar_data_e_hora
         )
 else:
     from .log import log
@@ -37,7 +38,8 @@ else:
         isEvery,
         reduzir_a_um,
         timeToTimedelta,
-        somar_data_e_hora
+        somar_data_e_hora,
+        factory_somar_data_e_hora
         )
 
 plt.rcParams["legend.fontsize"] = 11
@@ -84,7 +86,7 @@ class Serie():
                 markeredgecolor=None,      # Cor da borda do marcador
                 markeredgewidth=1.0,       # Largura da borda do marcador
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=1,                  # Ordem na sobreposição de elementos
+                zorder=10,                 # Ordem na sobreposição de elementos
                 drawstyle='default',       # Estilo de conexão dos pontos ('default', 'steps-pre', etc.)
                 )
         elif self.type == "bar":
@@ -99,7 +101,7 @@ class Serie():
                 hatch=None,                # Padrão de preenchimento (e.g., '/', '\\', 'x', etc.)
                 label=self.label_legend,   # Nome na legenda
                 alpha=None,                # Transparência (0.0 a 1.0)
-                zorder=100,                # Ordem na sobreposição de elementos
+                zorder=9,                 # Ordem na sobreposição de elementos
                 # log=False,               # Escala logarítmica no eixo y
                 error_kw=None,             # Parâmetros de erro adicionais para as barras de erro
                 capsize=None,              # Tamanho das extremidades das barras de erro
@@ -246,7 +248,11 @@ class Graphic():
             legendLoc='upper center',
             legendBbox_to_anchor = (0.5,-0.25),
             legendNcols=5,
-            labelTitleFontsize = 16
+            labelTitleFontsize = 16,
+            
+            invertXaxis = False,
+            invertYaxis = False,
+            invertY2axis = False,
         )
         self.setup.update(setup)
         self.rendered = False
@@ -281,11 +287,11 @@ class Graphic():
                 break
         if self.setup["grid"]:
             if self.hasSecundary:
-                self.ax2.grid(self.setup["grid"],axis="x")
-                self.ax.grid(self.setup["grid"],"both",axis="y")
+                self.ax2.grid(self.setup["grid"],axis="x",zorder=1)
+                self.ax.grid(self.setup["grid"],"both",axis="y",zorder=1)
             else:
-                self.ax.grid(self.setup["grid"],axis="x")
-                self.ax.grid(self.setup["grid"],"both",axis="y")
+                self.ax.grid(self.setup["grid"],axis="x",zorder=1)
+                self.ax.grid(self.setup["grid"],"both",axis="y",zorder=1)
 
         # Put the axis on the correct place
         if self.hasSecundary:
@@ -418,6 +424,20 @@ class Graphic():
         self.legend:Legend = self.ax.legend(self.handles, self.labels, loc=self.setup["legendLoc"], bbox_to_anchor=self.setup["legendBbox_to_anchor"], ncols=self.setup["legendNcols"], fontsize=self.setup["legendFonteSize"])
         self.fig.tight_layout()
         self.rendered = True
+        
+        
+        log.debug(self.setup["invertYaxis"])
+        # Definindo o sentidos dos três eixos depois de montar o gráfico e definir os limites dos eixos
+        if self.setup["invertXaxis"]:
+            log.debug("\n"*10,"Invertando o eixo X","\n"*10,)
+            self.ax.invert_xaxis()
+        if self.setup["invertYaxis"]:
+            log.debug("\n"*10,"Invertando o eixo Y","\n"*10,)
+            self.ax.invert_yaxis()
+        if self.hasSecundary and self.setup["invertY2axis"]:
+            self.ax2.invert_yaxis()
+        log.debug(self.ax.yaxis_inverted())
+        
         return
 
     def get_series(self):
@@ -465,6 +485,17 @@ EMPTY_SERIE_SECO = Serie(DataFrame([],columns=["Data"]),DataFrame([],columns=["V
 
 
 """ Modelo de cadastro e leituras do GEOTEC """
+ATUAL_X = "Coordenada Leste (X)"
+ATUAL_Y = "Coordenada Norte (Y)"
+ATUAL_Z = "Cota (Z)"
+INICIAL_X = "Coordenada Leste Instalação (X)"
+INICIAL_Y = "Coordenada Norte Instalação (Y)"
+INICIAL_Z = "Cota Instalação (Z)"
+DESLOC_X = "Coordenada Leste Deslocamento (X) (mm)"
+DESLOC_Y = "Coordenada Norte Deslocamento (Y) (mm)"
+DESLOC_Z = "Cota Deslocamento (X) (mm)"
+
+DFT_OUTLIER_DESLOC = 500 # milimetros
 
 class Instrumento():
     def __init__(self,
@@ -554,14 +585,17 @@ class Instrumento():
         except Exception as m:
             try:
                 log.critical(f"Função somar_data_e_hora foi usada no {self.codigo}")
-                df_mod["Data/Hora"] = somar_data_e_hora(df_mod["Data de Medição"], df_mod["Hora da Medição"])
+                df_mod["Data/Hora"] = df.apply(factory_somar_data_e_hora(), axis=1)
+                # df_mod["Data/Hora"] = somar_data_e_hora(df_mod["Data de Medição"], df_mod["Hora da Medição"])
                 raise Exception()
             except Exception as m:
                 if "###" in str(m):
                     log.critical(self.codigo)
                     log.critical(df_mod.to_string())
                     raise Exception()
-        
+                else:
+                    print(m)
+        log.debug(df_mod["Data/Hora"].to_string())
         # Ordenando o dataframe conforme a DATA e HORA da medição
         df_mod = df_mod.sort_values("Data/Hora")
         
@@ -612,6 +646,21 @@ class Instrumento():
             else:
                 log.warning(f"Instrumento {self.codigo} sem cadastro de base/fundo.")
                 
+        # Cálculo dos valores dx, dy, dz dos Marcos Topográficos e filtrando valores muito altos
+        
+        if self.tipo == "Marco Topográfico":
+            df_mod[DESLOC_X] = (df_mod[ATUAL_X] - self.dict_cadastro[INICIAL_X])*1000 # A deslocamento foi calculado em milímetro.
+            df_mod[DESLOC_Y] = (df_mod[ATUAL_Y] - self.dict_cadastro[INICIAL_Y])*1000 # A deslocamento foi calculado em milímetro.
+            df_mod[DESLOC_Z] = (df_mod[ATUAL_Z] - self.dict_cadastro[INICIAL_Z])*1000 # A deslocamento foi calculado em milímetro.
+            # Guardando leituras calculadas
+            self.deslocamentos_X_acima_de_10cm = df_mod[df_mod[DESLOC_X].abs() > DFT_OUTLIER_DESLOC]
+            self.deslocamentos_Y_acima_de_10cm = df_mod[df_mod[DESLOC_Y].abs() > DFT_OUTLIER_DESLOC]
+            self.deslocamentos_Z_acima_de_10cm = df_mod[df_mod[DESLOC_Z].abs() > DFT_OUTLIER_DESLOC]
+            # Filtrando leituras calculadas
+            df_mod = df_mod[df_mod[DESLOC_X].abs() <= DFT_OUTLIER_DESLOC]
+            df_mod = df_mod[df_mod[DESLOC_Y].abs() <= DFT_OUTLIER_DESLOC]
+            df_mod = df_mod[df_mod[DESLOC_Z].abs() <= DFT_OUTLIER_DESLOC]
+
         # Registrando leituras_válidas, unidades_lidas e porcentagem_seco
         self.leituras_validas = df_mod.copy()
         self.unidades_lidas = self.leituras_validas["Unidade de Medida"].copy().drop_duplicates().dropna().to_list()
@@ -641,6 +690,8 @@ class Instrumento():
         self.valor_minimo = self.leituras_validas["Valor"].min()
         self.periodo_leituras = self.data_hora_maxima - self.data_hora_minima
         
+        self.registro_mais_recente = self.leituras_validas[self.leituras_validas["Data/Hora"]==self.data_hora_maxima]
+        
         return
 
     def __str__(self):
@@ -660,12 +711,14 @@ class Instrumento():
         relatorio += f"{self.coordenadas=}\n"
         relatorio += f"{self.local=}\n"
         relatorio += f"{self.topo=}\n"
+        relatorio += f"{self.fundo_ou_base=}\n"
         relatorio += f"{self.base_celula=} ({self.label_cota_inferior})\n"
         relatorio += f"{self.crista_barragem=} / {self.soleira_vertedor=}\n"
         relatorio += f"{self.atencao=}\n"
         relatorio += f"{self.alerta=}\n"
         relatorio += f"{self.emergencia=}\n"
         relatorio += f"{self.porcentagem_seco=}\n\n\n"
+        relatorio += f"""REGISTRO MAIS RECENTE:\n{self.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS OUTLIERS:\n{self.leituras_outliers[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""            
         relatorio += f"""LEITURAS ACIMA DE NÍVEL DE CONTROLE:\n{self.leituras_acima_nv_controle[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
@@ -673,6 +726,15 @@ class Instrumento():
         relatorio += f"""LEITURAS NÃO REALIZADAS:\n{self.leituras_nao_realizada[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NULAS:\n{self.leituras_nulas[["Data de Medição","Hora da Medição","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS NEGATIVAS:\n{self.leituras_negativas[["Data de Medição","Hora da Medição","Valor","Justificativa de não Medição","Observação"]].to_string()}\n\n"""
+        if self.tipo == "Marco Topográfico":
+            leiturasAcima10cm = [
+                self.deslocamentos_X_acima_de_10cm,
+                self.deslocamentos_Y_acima_de_10cm,
+                self.deslocamentos_Z_acima_de_10cm,
+            ]
+            leiturasAcima10cm = concat(leiturasAcima10cm)
+            
+            relatorio += f"""LEITURAS COM DESLOCAMENTOS CARTESIANOS ACIMA DE 10 CM:\n{leiturasAcima10cm[["Data de Medição","Hora da Medição","Valor",DESLOC_X,DESLOC_Y,DESLOC_Z]].to_string()}\n\n"""            
         relatorio+="---------------\n"
         if file_path:
             with open(file=file_path,mode="w") as file:
