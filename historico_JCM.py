@@ -46,8 +46,8 @@ DFT_PARSE_DATES = [
 
 ################ ENTRADAS ################
 PATH_FOLDER = "data\\"
-PATH_LEITURAS = PATH_FOLDER+"Historico-até-01-FEV-2025.csv"
-PATH_CADASTRO = PATH_FOLDER+"Cadastro_Instrumento-01-02-2025-154527.xlsx"
+PATH_LEITURAS = PATH_FOLDER+"LEITURAS.csv"
+PATH_CADASTRO = PATH_FOLDER+"CADASTRO_INSTRUMENTOS.xlsx"
 PATH_CONFIG = PATH_FOLDER+"Config-Graficos.xlsx"
 ##########################################
 
@@ -134,6 +134,7 @@ graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
     # Inicialização das variáveis para cada gráfico
     temSeco = False
+    temTeste_de_Vida = False
     temJorrante = False
     hasSecundary = False
     listaLimitesDatas = []
@@ -242,7 +243,21 @@ for grafico in graphSetting["Nome do gráfico"]:
                 color=color,
                 toSecundary=toSecundary,
                 showLegend=False,
-                setup=dict(marker="x",linestyle="")
+                setup=dict(marker="x",linestyle="",markeredgecolor="black")
+                )
+            list_series.append(serie)
+            # Adicionado a série de Teste de Vida
+        if len(instrumento_obj.leituras_Teste_de_Vida)>0:
+            temTeste_de_Vida=True
+            serie = Serie(
+                X = instrumento_obj.leituras_Teste_de_Vida["Data/Hora"],
+                Y = instrumento_obj.leituras_Teste_de_Vida["Valor"],
+                type=type,
+                label=label,
+                color=color,
+                toSecundary=toSecundary,
+                showLegend=False,
+                setup=dict(marker="^",linestyle="")
                 )
             list_series.append(serie)
         
@@ -430,6 +445,8 @@ for grafico in graphSetting["Nome do gráfico"]:
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
+    if temTeste_de_Vida:
+        list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Teste de Vida",color="black",showLegend=True,setup=dict(marker="^",linestyle="")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
     log.debug("HEY!--------------------")
