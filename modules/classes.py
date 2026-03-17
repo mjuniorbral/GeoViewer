@@ -292,6 +292,10 @@ class Graphic():
             else:
                 self.ax.grid(self.setup["grid"],axis="x",zorder=1)
                 self.ax.grid(self.setup["grid"],"both",axis="y",zorder=1)
+        # IDEIA # Colocando o gráfico abaixo da plotagem
+        # self.ax.set_axisbelow(True)
+        # if self.hasSecundary:
+        #     self.ax2.set_axisbelow(True)
 
         # Put the axis on the correct place
         if self.hasSecundary:
@@ -536,6 +540,7 @@ class Instrumento():
         self.soleira_vertedor = reduzir_a_um([dict_cadastro['Cota da soleira do vertedor (m)']])
         self.porcentagem_seco:float = 0.0
         
+        self.serieAcompanhaTeste = False
         pass
 
     def set_leituras(self,df:DataFrame):
@@ -550,6 +555,7 @@ class Instrumento():
         self.leituras_outliers = df_vazio.copy()
         self.leituras_nulas = df_vazio.copy()
         self.leituras_secas = df_vazio.copy()
+        self.leituras_teste_de_vida = df_vazio.copy()
         self.leituras_jorrantes = df_vazio.copy()
         self.leituras_nao_secas = df_vazio.copy()
         self.leituras_validas = df_vazio.copy()
@@ -599,10 +605,11 @@ class Instrumento():
         # Ordenando o dataframe conforme a DATA e HORA da medição
         df_mod = df_mod.sort_values("Data/Hora")
         
-        # Isolando as leituras problemáticas
+        # Isolando as leituras não válidas para a série
         self.leituras_nao_realizada = df_mod[df_mod["Situação da Medição"]=="Não Realizada"]
         self.leituras_outliers = df_mod[df_mod["Outlier"]=="SIM"]
         self.leituras_negativas = df_mod[df_mod["Valor"]<0]
+        self.leituras_teste_de_vida = df_mod[df_mod["Condição Adversa"].str.lower()=="teste de vida"]
         
         # Filtrando as leituras Não Outliers e Realizadas
         df_mod = df_mod[df_mod["Situação da Medição"]=="Realizada"]
@@ -610,8 +617,12 @@ class Instrumento():
         # Isolando as leituras sem Valor registrado (não outliers e realizada)
         self.leituras_nulas = df_mod[isna(df_mod["Valor"])]
         
+        # Retirando as leituras dos testes de vida da série
+        if not self.serieAcompanhaTeste:
+            df_mod = df_mod[df_mod["Condição Adversa"].str.lower()!="teste de vida"]
+        
         # Preenchendo os valores da leituras secas e jorrantes com o valor da cota de fundo/base ou topo
-        valores_secos_jorrantes = Series(df_mod[~isna(df_mod["Condição Adversa"])]["Valor"])
+        valores_secos_jorrantes = Series(df_mod[df_mod["Condição Adversa"].isin(["SECO", "JORRANTE"])]["Valor"])
         if not (len(valores_secos_jorrantes)==0): # Há leituras secas e jorrantes
             valores_secos_jorrantes = valores_secos_jorrantes.dropna()
             if len(valores_secos_jorrantes.to_list())>0:
@@ -619,7 +630,7 @@ class Instrumento():
             df_mod.loc[df_mod["Condição Adversa"]=="SECO", "Valor"] = self.fundo_ou_base
             df_mod.loc[df_mod["Condição Adversa"]=="JORRANTE","Valor"] = self.topo
 
-        # Excluindo leituras sem valor depois do filtro de Outliers, Leituras Realizadas e Preenchimento dos SECOS e JORRANTES
+        # Excluindo leituras sem valor depois do filtro de Outliers, Leituras Realizadas e Preenchimento dos SECOS e JORRANTES, e Testes de Vida
         df_mod = df_mod[~isna(df_mod["Valor"])]
         df_mod = df_mod[df_mod["Valor"]>=0]
         
@@ -665,6 +676,7 @@ class Instrumento():
         self.leituras_validas = df_mod.copy()
         self.unidades_lidas = self.leituras_validas["Unidade de Medida"].copy().drop_duplicates().dropna().to_list()
         self.n_secos = len(self.leituras_secas)
+        self.n_testes_de_vida = len(self.leituras_teste_de_vida)
         self.n_leituras_validas = len(self.leituras_validas)
         try:
             self.porcentagem_seco = self.n_secos/float(self.n_leituras_validas)
@@ -720,6 +732,7 @@ class Instrumento():
         relatorio += f"{self.porcentagem_seco=}\n\n\n"
         relatorio += f"""REGISTRO MAIS RECENTE:\n{self.registro_mais_recente[["Código do Instrumento","Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS OUTLIERS:\n{self.leituras_outliers[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""            
+        relatorio += f"""LEITURAS DE TESTES DE VIDA:\n{self.leituras_teste_de_vida[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ACIMA DE NÍVEL DE CONTROLE:\n{self.leituras_acima_nv_controle[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ABAIXO DA COTA DE FUNDO/BASE:\n{self.leituras_abaixo_base[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""
         relatorio += f"""LEITURAS ACIMA DA COTA DE TOPO:\n{self.leituras_acima_topo[["Data de Medição","Hora da Medição","Valor","Unidade de Medida"]].to_string()}\n\n"""

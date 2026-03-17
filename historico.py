@@ -137,6 +137,7 @@ graphSetting:pd.DataFrame = graphSetting[graphSetting["Render"]==True]
 for grafico in graphSetting["Nome do gráfico"]:
     # Inicialização das variáveis para cada gráfico
     temSeco = False
+    temTeste_de_Vida = False
     temJorrante = False
     hasSecundary = False
     listaLimitesDatas = []
@@ -268,6 +269,20 @@ for grafico in graphSetting["Nome do gráfico"]:
                 )
             list_series.append(serie)
         
+        # Adicionado a série de Teste de Vida
+        if len(instrumento_obj.leituras_teste_de_vida)>0:
+            temTeste_de_Vida=True
+            serie = Serie(
+                X = instrumento_obj.leituras_teste_de_vida["Data/Hora"],
+                Y = instrumento_obj.leituras_teste_de_vida["Valor"],
+                type=type,
+                label=label,
+                color=color,
+                toSecundary=toSecundary,
+                showLegend=False,
+                setup=dict(marker="^",linestyle="",markeredgecolor="black", markersize=8)
+                )
+            list_series.append(serie)
         # Adicionado a série de leitura jorrantes
         if len(instrumento_obj.leituras_jorrantes.values)>0:
             temJorrante=True
@@ -477,6 +492,8 @@ for grafico in graphSetting["Nome do gráfico"]:
     # Inserindo as séries para as legendas de Seco e Jorrante
     if temSeco:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Secas",color="black",showLegend=True,setup=dict(marker="x",linestyle="")))
+    if temTeste_de_Vida:
+        list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Teste de Vida",color="gray",showLegend=True,setup=dict(marker="^",linestyle="",markeredgecolor="black")))
     if temJorrante:
         list_series.append(Serie(pd.DataFrame([],columns=["Data"]),pd.DataFrame([],columns=["Valor"]),label="Leituras Jorrantes",color="black",showLegend=True,setup=dict(marker="s",linestyle="")))
     log.debug("HEY!--------------------")
